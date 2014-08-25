@@ -1,0 +1,9 @@
+bin
+libs
+gen
+bin/AndroidManifest.xml
+bin/jarlist.cache
+bin/R.txt
+.classpath
+project.properties
+.project
