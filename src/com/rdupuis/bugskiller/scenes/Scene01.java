@@ -3,14 +3,11 @@ package com.rdupuis.bugskiller.scenes;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.rdupuis.bugskiller.R;
-import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.OpenGLActivity;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
-
-import android.os.SystemClock;
 
 /**
  * GLES20Renderer: the OGLES 2.0 Thread.
