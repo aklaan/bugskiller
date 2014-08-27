@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">bugskiller</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">BugsKiller</string>
+
+   
+    <!-- nom des objets -->
+    
+
+    <string name="background">background</string>
+    <string name="spyro">spyro</string>
+    
+    <string name="USER_FINGER">USER_FINGER</string>
+    
+    <!-- nom des textures -->
+
+    <string name="textureisoland">isoland.jpeg</string>
+    <string name="texturespyro">spyro.png</string>
+    
+ 
+    <!-- parametrage du projet -->
+    
+    <string name="imagesfolder">images</string>
+    
+   
 
 </resources>
