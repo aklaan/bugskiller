@@ -17,6 +17,8 @@
     <string name="textureisoland">isoland.jpeg</string>
     <string name="texturespyro">spyro.png</string>
     
+    <string name="bugalive">blue.png</string>
+    <string name="bugdead">red.png</string>
  
     <!-- parametrage du projet -->
     

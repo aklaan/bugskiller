@@ -3,10 +3,12 @@ package com.rdupuis.bugskiller.scenes;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.rdupuis.bugskiller.R;
+import com.rdupuis.bugskiller.gamecomponents.Bug;
 import com.rdupuis.gamefactory.components.OpenGLActivity;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
 
 /**
@@ -25,7 +27,7 @@ public class Scene01 extends Scene {
 		Rectangle2D background = new Rectangle2D(DrawingMode.FILL);
 		background.setCoord((float) this.getWidth() / 2,
 				(float) this.getHeight() / 2);
-		background.sethight((float) this.getHeight());
+		background.setHeight((float) this.getHeight());
 		background.setWidth((float) this.getWidth());
 		;
 		background.setTagName(R.string.background);
@@ -33,6 +35,16 @@ public class Scene01 extends Scene {
 				background);
 		this.addToScene(background);
 
+		Bug bug =new Bug(this.getBitmapProvider().getTexture(R.string.bugalive),this.getBitmapProvider().getTexture(R.string.bugdead));
+		bug.setWidth(50);
+		bug.setHeight(50);
+		bug.setCoord((float) this.getWidth() / 2,
+			(float) this.getHeight() / 2);
+
+		
+		this.addToScene(bug);
+		
+		
 	}
 
 	@Override
@@ -40,7 +52,7 @@ public class Scene01 extends Scene {
 		this.getProgramShaderProvider().catalogShader.clear();
 		this.getProgramShaderProvider().shaderList.clear();
 		this.getProgramShaderProvider().add(new ProgramShader_simple());
-
+		this.getProgramShaderProvider().add(new ProgramShader_forLines());
 	}
 
 	@Override
@@ -49,6 +61,8 @@ public class Scene01 extends Scene {
 		String imageFolder = this.getActivity().getString(R.string.imagesfolder);
 		this.getBitmapProvider().add(imageFolder,R.string.textureisoland);
 		this.getBitmapProvider().add(imageFolder,R.string.texturespyro);
+		this.getBitmapProvider().add(imageFolder,R.string.bugalive);
+		this.getBitmapProvider().add(imageFolder,R.string.bugdead);
 	}
 
 	@Override
