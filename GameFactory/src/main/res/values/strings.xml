@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">testgame</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    
+        <string name="petit_robot">robot</string>
+    
+    <string name="ligne1">ligne1</string>
+    <string name="ligne2">ligne2</string>
+    <string name="starship1">starship1</string>
+    <string name="starship2">starship2</string>
+    <string name="background">background</string>
+    <string name="spyro">spyro</string>
+    
+    <string name="USER_FINGER">USER_FINGER</string>
+    
+    <string name="startUp">startUp.png</string>
+    <string name="startDown">startDown.png</string>
+    <string name="boulerouge">boule.png</string>
+    <string name="textureStarship">spaceship.png</string>
+    <string name="textureRobot">texture.png</string>
+    <string name="texturerId">red.png</string>
+    <string name="textureTest">test.png</string>
+    <string name="textureTestAnim">testAnim.png</string>
+    <string name="textureisoland">isoland.jpeg</string>
+    <string name="texturespyro">spyro.png</string>
+    
+    <string name="textureWhite">blanc.png</string>
+    <string name="textureBlue">blue.png</string>
+    
+    
+    <string name="imagesfolder">images</string>
+    
+    <!--  déclaration des sources de shaders -->
+    <string name="defaultshader_vertex_source">shaders/default/simple_shader.vsh</string>
+	<string name="defaultshader_fragment_source">shaders/default/simple_shader.fsh</string>
+
+</resources>
