@@ -46,7 +46,8 @@ public class OpenGLActivity extends Activity {
 		mGLSurfaceView.setDebugFlags(GLSurfaceView.DEBUG_CHECK_GL_ERROR);
 		 // Create an OpenGL ES 2.0 context.
 		mGLSurfaceView.setEGLContextClientVersion(2);
-	
+
+
 	//	mGLSurfaceView.setRenderer(new GLES20RendererScene01(this));
 
 		setContentView(mGLSurfaceView);

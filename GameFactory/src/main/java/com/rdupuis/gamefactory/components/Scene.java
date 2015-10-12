@@ -90,6 +90,8 @@ public class Scene implements GLSurfaceView.Renderer {
 
 		initProgramShader();
 
+
+
 		// on active le texturing 2D
 		GLES20.glEnable(GLES20.GL_TEXTURE_2D);
 

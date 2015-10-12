@@ -61,8 +61,7 @@ public class Bug extends Rectangle2D {
 	public void onUpdate() {
 		
 		if (this.isAlive()) {
-			
-			
+
 			//
 			float elapsedTime = SystemClock.elapsedRealtime() - lastTrajectoryChange;
 			if (elapsedTime >changeTrajectoryDelai){
