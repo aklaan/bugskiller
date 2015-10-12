@@ -22,7 +22,7 @@ public class MySurfaceView extends GLSurfaceView {
 
 	public static enum ScreenEvent {
 		SCROLL_H_RIGHT, SCROLL_H_LEFT, SCROLL_V_UP, SCROLL_V_DOWN, SHORT_PRESS, LONG_PRESS, UNKNOWN
-	};
+	}
 
 	private ScreenEvent event;
 
@@ -47,6 +47,8 @@ public class MySurfaceView extends GLSurfaceView {
 			touched = false;
 			this.histoX = this.touchX;
 			this.histoY = this.touchY;
+
+
 			this.event = ScreenEvent.UNKNOWN;
 			
 			break;
@@ -120,6 +122,7 @@ public class MySurfaceView extends GLSurfaceView {
 
 		}
 
+		requestRender();
 		return true;
 
 	}

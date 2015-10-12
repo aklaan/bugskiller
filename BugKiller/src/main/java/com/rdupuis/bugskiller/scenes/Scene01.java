@@ -1,5 +1,6 @@
 package com.rdupuis.bugskiller.scenes;
 
+import android.opengl.GLSurfaceView;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
@@ -48,7 +49,7 @@ public class Scene01 extends Scene {
 
 //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(50, 50, 100, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
+        button = new Button(150, 150, 100, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
                 this.getBitmapProvider().getTexture(R.string.bugdead));
 
         this.addToScene(button);
@@ -57,25 +58,19 @@ public class Scene01 extends Scene {
             @Override
             public void onClick() {
                 Log.e("tototot", "click");
-
+                Scene01.this.getActivity().getSurfaceView().setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
             }
 
             @Override
             public void onLongClick() {
                 Log.e("tototot", "long click");
-
+                Scene01.this.getActivity().getSurfaceView().setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
             }
 
 
         };
 
         button.addGLButtonListener(toto);
-    }
-
-
-    public void domess() {
-        Toast.makeText(Scene01.this.getActivity(), "coucou les amis", Toast.LENGTH_SHORT).show();
-
     }
 
 

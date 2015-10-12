@@ -260,6 +260,8 @@ public class Scene implements GLSurfaceView.Renderer {
 		// Calculate the projection and view transformation
 		// Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
 
+		//on commence par initialiser le touché
+		this.getUserFinger().mainUpdate(mActivity);
 
 		// Pour chaques GameObject de la sc�ne, on appelle
 		// la mise � jour et on le dessine s'il est visible.
@@ -271,6 +273,7 @@ public class Scene implements GLSurfaceView.Renderer {
 				gameObject.draw();
 			}
 		}
+
 
 		// on check les colissions entre tous les �l�ments de la sc�ne
 		//si on place le chek avant de dessiner, sur la premi�re frame tous les �l�ments sont en 0,0
@@ -289,8 +292,9 @@ public class Scene implements GLSurfaceView.Renderer {
 		}
 		// SystemClock.sleep(2000);
 	
-	
-	
+	UserFinger uf = getUserFinger();
+		uf.histoX = 0f;
+		uf.histoY = 0f;
 	}
 
 	/**
