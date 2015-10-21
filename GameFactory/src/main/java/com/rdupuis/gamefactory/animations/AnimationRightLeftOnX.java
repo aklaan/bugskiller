@@ -26,12 +26,12 @@ public class AnimationRightLeftOnX extends Animation {
 
 		if (elapsedTime < 2000) {
 			// offsetX += 0.5f;
-			this.getParent().X += offsetX;
+			this.getAnimatedGameObject().X += offsetX;
 		} else {
 
 			if (elapsedTime >= 2000 && elapsedTime <= 4000) {
 				// offsetX -= 0.5f;
-				this.getParent().X -= offsetX;
+				this.getAnimatedGameObject().X -= offsetX;
 			} else {
 				this.setStatus(AnimationStatus.STOPPED);
 			}

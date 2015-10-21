@@ -1,6 +1,7 @@
 package com.rdupuis.gamefactory.components;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
@@ -39,7 +40,7 @@ public class Button extends Rectangle2D implements Clikable {
         this.listening = false;
         this.textureUp = textureUp;
         this.textureDown = textureDown;
-        this.enableColission();
+        this.enableColision();
         this.isStatic = false;
         this.textureEnabled = true;
     }
@@ -51,9 +52,12 @@ public class Button extends Rectangle2D implements Clikable {
 
     @Override
     public void onUpdate() {
-        if (SystemClock.elapsedRealtime() - this.lastTap > DELAY_BTWN_TAP) {
+        this.setTexture(this.textureUp);
+      //  Log.e("button", "on update");
+        if (SystemClock.elapsedRealtime() - this.lastTap != DELAY_BTWN_TAP) {
 
             if (this.isCollideWith(this.getScene().getGameObjectByTag(UserFinger.USER_FINGER_TAG))) {
+        //        Log.e("button", "set texture down");
                 this.setTexture(this.textureDown);
                 this.status = ButtonStatus.DOWN;
 
@@ -88,7 +92,7 @@ public class Button extends Rectangle2D implements Clikable {
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
                 //on a levé le doigt avant de délai d'un long click
-                if ( elapsedTime < ON_LONG_CLICK_DELAY) {
+                if (elapsedTime < ON_LONG_CLICK_DELAY) {
                     onClick();
                     this.listening = false;
                 }

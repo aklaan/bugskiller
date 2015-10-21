@@ -13,12 +13,12 @@ public class AnimationRotate extends Animation {
 	@Override
 	public void start() {
 		super.start();
-		
+		this.setStatus(AnimationStatus.PLAYING);
 	}
 
 	@Override
 	public void play() {
-    this.getParent().angleRADZ += 5.5f;
+    this.getAnimatedGameObject().angleRADX += 5.5f;
     
 	}
 

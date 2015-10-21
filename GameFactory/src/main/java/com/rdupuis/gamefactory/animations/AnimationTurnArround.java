@@ -5,7 +5,6 @@ import com.rdupuis.gamefactory.components.GameObject;
 public class AnimationTurnArround extends Animation {
 
 	GameObject mCible;
-	float speed;
 	float distance;
 	float angle;
 
@@ -13,7 +12,7 @@ public class AnimationTurnArround extends Animation {
 		super(parent);
 		this.mCible = cible;
 		this.angle = 0.0f;
-		this.speed = 5.0f;
+		this.setSpeed(5.0f);
 		this.distance = distance;
 	}
 
@@ -28,10 +27,10 @@ public class AnimationTurnArround extends Animation {
 
 		if (this.mCible != null) {
 			this.angle += 0.05f;
-			this.getParent().X = mCible.X
-					+ (float) (Math.cos(this.angle * this.speed) * this.distance);
-			this.getParent().Y = mCible.Y
-					+ (float) (Math.sin(this.angle * this.speed) * this.distance);
+			this.getAnimatedGameObject().X = mCible.X
+					+ (float) (Math.cos(this.angle * this.getSpeed()) * this.distance);
+			this.getAnimatedGameObject().Y = mCible.Y
+					+ (float) (Math.sin(this.angle * this.getSpeed()) * this.distance);
 
 		}
 

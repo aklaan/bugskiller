@@ -47,7 +47,7 @@ public class GameObject implements Drawable, Cloneable {
 	public ArrayList<GameObject> mCollideWithList;
 
 	public ArrayList<GameObject> mGameObjectToListenList;
-	public Animation mAnimation;
+	//public Animation mAnimation;
 
 	public float[] mRotationMatrix = new float[16];
 	public float[] mModelView = new float[16];
@@ -117,13 +117,6 @@ public class GameObject implements Drawable, Cloneable {
 		return this.mGameObjectToListenList;
 	}
 
-	public Animation getAnimation() {
-		return this.mAnimation;
-	}
-
-	public void setAnimation(Animation anim) {
-		this.mAnimation = anim;
-	}
 
 	public void initBuffers(int nbIndex) {
 		int nbVertex = mVertices.size();
@@ -138,14 +131,16 @@ public class GameObject implements Drawable, Cloneable {
 
 	}
 
-	public void enableColission() {
+	public void enableColision() {
 		this.mCollisionBox = new CollisionBox(this);
 		this.canCollide = true;
 	}
 
-	public void disableColission() {
+	public void disableColision() {
 		this.mCollisionBox = null;
 		this.canCollide = false;
+		this.mCollideWithList.clear();
+
 	}
 
 	// setter vertices
@@ -395,11 +390,12 @@ public class GameObject implements Drawable, Cloneable {
 		// la mise � jour
 		this.onUpdate();
 
+		// traiter la lecture de l'animation si elle existe
+		//this.applyAnimation();
+
 		// traiter les actions a faire en cas de colissions
 		this.applyCollisions();
 
-		// traiter la lecture de l'animation si elle existe
-		this.applyAnimation();
 
 		// A la fin des mises � jour on connais les nouvelles coordon�es
 		// on peut calculer la nouvelle matrice modelView
@@ -449,28 +445,6 @@ public class GameObject implements Drawable, Cloneable {
 
 	}
 
-	/***********************************************
-	 * Traiter l'animation si elle existe
-	 **********************************************/
-	public void applyAnimation() {
-		// -----------------------------------------
-		// traiter l'animation
-		// --------------------------------------------------------
-		if (this.getAnimation() != null) {
-
-			if (this.getAnimation().getStatus() == Animation.AnimationStatus.PLAYING) {
-				this.getAnimation().play();
-				// traiter les actions supl�mentaires lors de la lecture
-				onAnimationPlay();
-			}
-			if (this.getAnimation().getStatus() == Animation.AnimationStatus.STOPPED) {
-				// this.setAnimation(null);
-				// traiter les actions supl�mentaires a la fin de la lecture
-				onAnimationStop();
-			}
-
-		}
-	}
 
 	/********************************************************
 	 * On �coute les objets note : on d�pend de l'ordre dans lequel sont trait�
@@ -545,6 +519,7 @@ public class GameObject implements Drawable, Cloneable {
 		}
 
 		// on r�initialise le lien de parent� avec l'animation
+		/**
 		if (gameobject.getAnimation() != null) {
 			Animation anim = (Animation) gameobject.getAnimation().clone();
 
@@ -557,9 +532,10 @@ public class GameObject implements Drawable, Cloneable {
 		// red�fini un nouvelle boite de colision pour la cible
 		// sinon elle va avoir la m�me que la source
 		if (gameobject.canCollide) {
-			gameobject.enableColission();
+			gameobject.enableColision();
 
 		}
+		 */
 		return gameobject;
 	}
 

@@ -4,42 +4,35 @@ import com.rdupuis.gamefactory.components.GameObject;
 
 public class AnimationFadeOut extends Animation {
 
-	private float speed;
 
-	public AnimationFadeOut(GameObject parent) {
-		super(parent);
+    public AnimationFadeOut(GameObject animatedGameObject) {
+        super(animatedGameObject);
+        start();
+    }
 
-	}
+    @Override
+    public void start() {
+        super.start();
+        this.setStatus(AnimationStatus.PLAYING);
+        this.setSpeed(0.01f);
 
-	@Override
-	public void start() {
-		super.start();
-		this.setSpeed(0.01f);
+    }
 
-	}
+    @Override
+    public void play() {
 
-	@Override
-	public void play() {
+        //Log.i("bugAlpha",String.valueOf(this.getParent().getAlpha()));
 
-		//Log.i("bugAlpha",String.valueOf(this.getParent().getAlpha()));
-		
-		if (this.getParent().getAlpha() > 0.001) {
-			this.getParent().setAlpha(
-					this.getParent().getAlpha() - (this.speed));
-		} else {
-		this.getParent().setAlpha(0.0f);
-		this.stop();
-		
-		}
+        if (this.getAnimatedGameObject().getAlpha() > 0.001) {
+            this.getAnimatedGameObject().setAlpha(
+                    this.getAnimatedGameObject().getAlpha() - (this.getSpeed()));
+        } else {
+            this.getAnimatedGameObject().setAlpha(0.0f);
+            this.stop();
 
-	}
+        }
 
-	public float getSpeed() {
-		return speed;
-	}
+    }
 
-	public void setSpeed(float speed) {
-		this.speed = speed;
-	}
 
 }

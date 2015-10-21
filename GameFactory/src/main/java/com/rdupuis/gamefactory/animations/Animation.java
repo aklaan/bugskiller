@@ -6,72 +6,81 @@ import android.os.SystemClock;
 
 public abstract class Animation implements Cloneable {
 
-	float startTime;
-	float endTime;
-	
-	public static  enum playingMode {
-		NONE, ONCE, REPEAT_N, LOOP
-	};
+    float startTime;
+    float endTime;
+    private float speed;
 
-	public static  enum AnimationStatus {
-		PLAYING, STOPPED
-	};
+    public static enum playingMode {
+        NONE, ONCE, REPEAT_N, LOOP
+    }
 
-	private GameObject parent;
-	private AnimationStatus status;
+    public static enum AnimationStatus {
+        PLAYING, STOPPED
+    }
 
-	
-	/****************************************************************
-	 * getters / setters 
-	 * 
-	 *********************************************************/
-	
-	public GameObject getParent(){
-		return this.parent;
-		
-	}
-	
-	public void setParent(GameObject gameObject){
-		this.parent = gameObject;
-		
-	}
-	
-	
-	public AnimationStatus getStatus(){
-		return this.status;
-		
-	}
-	
-	public void setStatus(AnimationStatus status){
-		this.status = status;
-		
-	}
-	
-	//constructeur
-	public Animation(GameObject parent) {
-		this.parent = parent;
+    private GameObject animatedGameObject;
+    private AnimationStatus status;
 
-	}
 
-	public void start() {
-		if (this.status != AnimationStatus.PLAYING) {
-			startTime = SystemClock.elapsedRealtime();
-			this.status = AnimationStatus.PLAYING;
-		}
-}
+    /****************************************************************
+     * getters / setters
+     *********************************************************/
 
-	public void stop() {
-		this.status = AnimationStatus.STOPPED;
-		endTime = SystemClock.elapsedRealtime();
-	}
+    public GameObject getAnimatedGameObject() {
+        return this.animatedGameObject;
 
-	public void play() {
-		
-	}
+    }
 
-	
-	public Animation clone() throws CloneNotSupportedException{
-		return (Animation)super.clone();
-	
-	}
+    public void setAnimatedGameObject(GameObject gameObject) {
+        this.animatedGameObject = gameObject;
+
+    }
+
+    public float getSpeed() {
+
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+
+        this.speed = speed;
+    }
+
+    public AnimationStatus getStatus() {
+        return this.status;
+
+    }
+
+    public void setStatus(AnimationStatus status) {
+        this.status = status;
+
+    }
+
+    //constructeur
+    public Animation(GameObject animatedGameObject) {
+        this.animatedGameObject = animatedGameObject;
+
+    }
+
+    public void start() {
+        if (this.status != AnimationStatus.PLAYING) {
+            startTime = SystemClock.elapsedRealtime();
+            this.status = AnimationStatus.PLAYING;
+        }
+    }
+
+    public void stop() {
+        this.status = AnimationStatus.STOPPED;
+        endTime = SystemClock.elapsedRealtime();
+    }
+
+    public void play() {
+
+    }
+
+
+    public Animation clone() throws CloneNotSupportedException {
+        return (Animation) super.clone();
+
+    }
 }

@@ -20,6 +20,7 @@ public class MainActivity extends OpenGLActivity {
 
 
         //
+
         mGLSurfaceView.setRenderer(new Scene01(this));
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         EditText editText = new EditText(this);

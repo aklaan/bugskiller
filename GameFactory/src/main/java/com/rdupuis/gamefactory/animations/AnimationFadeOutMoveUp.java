@@ -4,7 +4,6 @@ import com.rdupuis.gamefactory.components.GameObject;
 
 public class AnimationFadeOutMoveUp extends Animation {
 
-	private float speed;
 
 	public AnimationFadeOutMoveUp(GameObject parent) {
 		super(parent);
@@ -22,24 +21,17 @@ public class AnimationFadeOutMoveUp extends Animation {
 	public void play() {
 
 		//Log.i("bugAlpha",String.valueOf(this.getParent().getAlpha()));
-		this.getParent().Y= (float) (this.getParent().getCoordY() + 1);
-		if (this.getParent().getAlpha() > 0.001) {
-			this.getParent().setAlpha(
-					this.getParent().getAlpha() - (this.speed));
+		this.getAnimatedGameObject().Y= (float) (this.getAnimatedGameObject().getCoordY() + 1);
+		if (this.getAnimatedGameObject().getAlpha() > 0.001) {
+			this.getAnimatedGameObject().setAlpha(
+					this.getAnimatedGameObject().getAlpha() - (this.getSpeed()));
 		} else {
-		this.getParent().setAlpha(0.0f);
+		this.getAnimatedGameObject().setAlpha(0.0f);
 		this.stop();
 		
 		}
 
 	}
 
-	public float getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(float speed) {
-		this.speed = speed;
-	}
 
 }

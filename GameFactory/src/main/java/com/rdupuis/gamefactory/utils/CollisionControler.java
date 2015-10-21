@@ -1,5 +1,7 @@
 package com.rdupuis.gamefactory.utils;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import com.rdupuis.gamefactory.components.CollisionBox;
@@ -13,7 +15,11 @@ public class CollisionControler {
 
     public static void checkAllCollisions(ArrayList<GameObject> mGameObjectList) {
 
+
         for (GameObject gameObject : mGameObjectList) {
+//            Log.e("colideCtrl", gameObject.getTagName());
+            gameObject.mCollideWithList.clear();
+
 
             // on ne contrôle les colisions que pour les objets en mouvement
             if (gameObject.isStatic == false && gameObject.canCollide) {
@@ -28,7 +34,7 @@ public class CollisionControler {
 
                         if (checkCollision(go.mCollisionBox,
                                 gameObject.mCollisionBox)) {
-
+  //                          Log.e("check_colide", gameObject.getTagName() + " colide with " + go.getTagName());
                             //gameObject.mCollideWithList.add(go.mCollisionBox);
                             gameObject.mCollideWithList.add(go);
                         }

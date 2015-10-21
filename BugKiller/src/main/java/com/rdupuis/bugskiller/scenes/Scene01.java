@@ -9,8 +9,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.rdupuis.bugskiller.R;
 import com.rdupuis.bugskiller.gamecomponents.Bug;
+import com.rdupuis.gamefactory.animations.AnimationFadeOut;
+import com.rdupuis.gamefactory.animations.AnimationRotate;
 import com.rdupuis.gamefactory.components.Button;
 import com.rdupuis.gamefactory.components.GLButtonListener;
+import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.OpenGLActivity;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
@@ -36,9 +39,10 @@ public class Scene01 extends Scene {
         background.setHeight((float) this.getHeight());
         background.setWidth((float) this.getWidth());
 
-        background.setTagName(R.string.background);
+        background.setTagName("background");
+        background.disableColision();
         this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
-        this.addToScene(background);
+//        this.addToScene(background);
 
         Bug bug = new Bug(this.getBitmapProvider().getTexture(R.string.bugalive), this.getBitmapProvider().getTexture(R.string.bugdead));
         bug.setWidth(50);
@@ -47,24 +51,31 @@ public class Scene01 extends Scene {
         this.addToScene(bug);
 
 
-//Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
+     //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(150, 150, 100, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
+        button = new Button(450, 150, 100, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
                 this.getBitmapProvider().getTexture(R.string.bugdead));
-
+        button.setTagName("Bouton");
         this.addToScene(button);
+
+
+
 
         GLButtonListener toto = new GLButtonListener() {
             @Override
             public void onClick() {
                 Log.e("tototot", "click");
-                Scene01.this.getActivity().getSurfaceView().setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+                GameObject bug =Scene01.this.getGameObjectByTag("bug");
+                Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
+
             }
 
             @Override
             public void onLongClick() {
                 Log.e("tototot", "long click");
-                Scene01.this.getActivity().getSurfaceView().setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+                GameObject bug =Scene01.this.getGameObjectByTag("bug");
+                Scene01.this.getAnimationManager().addAnimation(new AnimationFadeOut(bug));
+
             }
 
 
