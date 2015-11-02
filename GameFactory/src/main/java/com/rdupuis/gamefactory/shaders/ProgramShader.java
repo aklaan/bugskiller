@@ -88,8 +88,8 @@ public class ProgramShader {
 
 	/**
 	 * 
-	 * @param vertexFilename
-	 * @param fragmentFilename
+	 * @param vertexCode
+	 * @param fragmentCode
 	 * @return
 	 */
 	public boolean loadShaders(String vertexCode, String fragmentCode) {
@@ -138,10 +138,9 @@ public class ProgramShader {
 			if (compiled[0] == 0) {
 				Log.e(this.getClass().getName(), "Could not compile shader "
 						+ shaderType + ":");
-				Log.e(this.getClass().getName(),
-						GLES20.glGetShaderInfoLog(shader));
-				GLES20.glDeleteShader(shader);
-				shader = 0;
+				throw new RuntimeException("Erreur de compilation du Shader : " +GLES20.glGetShaderInfoLog(shader));
+				//GLES20.glDeleteShader(shader);
+				//shader = 0;
 			}
 		}
 		Log.i(this.getClass().getName(), this.mName + " : " + shaderType

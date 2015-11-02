@@ -76,9 +76,10 @@ public class ProgramShader_simple extends ProgramShader {
                         // on calcule la position du point via la matrice de projection
                         + " pos = " + this.VSH_ATTRIB_VERTEX_COORD + ";"
 
-                        + " vec4 position = uMvp * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
+                        + " vec4 position = " + this.VSH_UNIFORM_MVP + " * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
                         // + " vec4 position = vec4(aPosition.xyz, 1.);"
-                        + " vColor = aColor;" + " vTexCoord = aTexCoord;"
+                        + " vColor = aColor;"
+                        + " vTexCoord = aTexCoord;"
                         + "gl_PointSize = 10.;"
                         // cette commande doit toujours être la dernière du vertex shader.
                         + "	gl_Position =  position;" + "}";

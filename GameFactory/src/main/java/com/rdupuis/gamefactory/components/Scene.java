@@ -99,6 +99,10 @@ public class Scene implements GLSurfaceView.Renderer {
 
         initProgramShader();
 
+        //on défini la couleur de base pour initialiser le BUFFER
+        // a chaque fois que l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        //on va remplir le buffer avec la couleur pré-définie ici
+        GLES20.glClearColor(0.3f, 0.2f, 0.2f, 1.0f);
 
         // on active le texturing 2D
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
@@ -114,11 +118,12 @@ public class Scene implements GLSurfaceView.Renderer {
         GLES20.glFrontFace(GL10.GL_CCW);
 
         // on indique quelle face à oculter (par défaut c'est BACK)
-        GLES20.glCullFace(GL10.GL_BACK);
+ //       GLES20.glCullFace(GL10.GL_BACK);
 
         // Activation du Culling
-        GLES20.glEnable(GL10.GL_CULL_FACE);
+//        GLES20.glEnable(GL10.GL_CULL_FACE);
 
+        GLES20.glLineWidth(4.f);
         //
 
         // create texture handle
@@ -212,11 +217,8 @@ public class Scene implements GLSurfaceView.Renderer {
         //on mémorise le moment où on commence le cycle
         float startDrawingTime = SystemClock.currentThreadTimeMillis();
 
-        // on commence par effacer l'écran en le remplissant de la
-        // couleur souhaitée et on vide le buffer.
-        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        // on vide le buffer.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
 
         /**
          * ici on joue sur les évènements déterminés par la SurfaceView pour
@@ -318,14 +320,14 @@ public class Scene implements GLSurfaceView.Renderer {
         }
 
 /**
-        if (this.animationManager.playInProgress()) {
-            this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+ if (this.animationManager.playInProgress()) {
+ this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
-        } else {
-            this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+ } else {
+ this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        }
-*/
+ }
+ */
 
         /****************************************************************************
          * Pour une Animation fluide, 60 FPS sont sufisants

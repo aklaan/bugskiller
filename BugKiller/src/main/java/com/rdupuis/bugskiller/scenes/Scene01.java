@@ -1,9 +1,6 @@
 package com.rdupuis.bugskiller.scenes;
 
-import android.opengl.GLSurfaceView;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -26,6 +23,10 @@ import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
  */
 public class Scene01 extends Scene {
 
+    private final String TAG_BUG = "scene1:bug";
+    private final String TAG_BACKGROUND = "scene1:background";
+    private final String TAG_BUTTON = "scene1:button";
+
     public Scene01(OpenGLActivity activity) {
         super(activity);
         // TODO Auto-generated constructor stub
@@ -34,46 +35,49 @@ public class Scene01 extends Scene {
     @Override
     public void loadGameObjects() {
 
+        //BACKGROUND
         Rectangle2D background = new Rectangle2D(DrawingMode.FILL);
         background.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
         background.setHeight((float) this.getHeight());
         background.setWidth((float) this.getWidth());
 
-        background.setTagName("background");
+        background.setTagName(TAG_BACKGROUND);
         background.disableColision();
         this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
-//        this.addToScene(background);
+        //this.addToScene(background);
 
+        //BUG
         Bug bug = new Bug(this.getBitmapProvider().getTexture(R.string.bugalive), this.getBitmapProvider().getTexture(R.string.bugdead));
         bug.setWidth(50);
         bug.setHeight(50);
         bug.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
+        bug.setTagName(TAG_BUG);
         this.addToScene(bug);
 
 
-     //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
+        //BUTTON
+        //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(450, 150, 100, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
+        button = new Button(450, 150, 200, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
                 this.getBitmapProvider().getTexture(R.string.bugdead));
-        button.setTagName("Bouton");
+        button.setTagName(TAG_BUTTON);
+        button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
+        button.mCollisionBox.isVisible = true;
         this.addToScene(button);
-
-
-
 
         GLButtonListener toto = new GLButtonListener() {
             @Override
             public void onClick() {
-                Log.e("tototot", "click");
-                GameObject bug =Scene01.this.getGameObjectByTag("bug");
+                Log.e("debug", "click");
+                GameObject bug = Scene01.this.getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
 
             }
 
             @Override
             public void onLongClick() {
-                Log.e("tototot", "long click");
-                GameObject bug =Scene01.this.getGameObjectByTag("bug");
+                Log.e("debug", "long click");
+                GameObject bug = Scene01.this.getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationFadeOut(bug));
 
             }
@@ -101,12 +105,5 @@ public class Scene01 extends Scene {
         this.getBitmapProvider().add(imageFolder, R.string.texturespyro);
         this.getBitmapProvider().add(imageFolder, R.string.bugalive);
         this.getBitmapProvider().add(imageFolder, R.string.bugdead);
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        super.onDrawFrame(gl);
-
-
     }
 }

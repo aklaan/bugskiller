@@ -17,8 +17,8 @@ public class UserFinger extends Rectangle2D {
 
     public UserFinger() {
         super(DrawingMode.EMPTY);
-        this.setHeight(100);
-        this.setWidth(100);
+        this.setHeight(50);
+        this.setWidth(50);
         this.enableColision();
         this.mCollisionBox.isVisible = false;
         this.setTagName(USER_FINGER_TAG);

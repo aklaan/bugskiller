@@ -22,11 +22,16 @@ public class MainActivity extends OpenGLActivity {
         //
 
         mGLSurfaceView.setRenderer(new Scene01(this));
-        mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+       // mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         EditText editText = new EditText(this);
         editText.setText("Bonjour");
         editText.setTextColor(Color.WHITE);
-        addContentView(editText, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+//        addContentView(editText, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        View toto = getLayoutInflater().inflate(R.layout.activity_main,null);
+
+       addContentView(toto, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
     }
 
     protected void onSaveInstanceState(Bundle savedInstanceState) {

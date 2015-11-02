@@ -10,12 +10,21 @@ public class Vertex implements Cloneable{
 	public float u;
 	public float v;
 
-	
-    public final static int Vertex_COORD_SIZE = 3;
-    public final static int Vertex_COORD_SIZE_BYTES = Vertex_COORD_SIZE*4;
+	//on calcul la taille d'un float en mémoire
+	//généralement c'est 4 octet, mais en fonction du matériel ça peut être différent
+	//par sécurité, on le recalcule plutot que d'utiliser 4 par défaut.
+	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 
+
+	//pour les coordonnées on a 3 float X,Y,Z
+    public final static int Vertex_COORD_SIZE = 3;
+	//la taille mémoire necessaire pour stocker les coordonées du vertex
+    public final static int Vertex_COORD_SIZE_BYTES = Vertex_COORD_SIZE*FLOAT_SIZE;
+
+	//Pour les coordonées de texture on a 2 Float U,V
     public final static int Vertex_TEXT_SIZE = 2;
-    public final static int Vertex_TEXT_SIZE_BYTES = Vertex_TEXT_SIZE*4;
+	//la taille mémoire necessaire pour stocker les coordonées de texture
+	public final static int Vertex_TEXT_SIZE_BYTES = Vertex_TEXT_SIZE*FLOAT_SIZE;
 
 public Vertex() {
 	x=y=z=u=v=0f;
