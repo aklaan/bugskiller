@@ -91,11 +91,13 @@ public class ProgramShader_simple extends ProgramShader {
      */
     @Override
     public void initLocations() {
-        // les attribs
+        // on récupère l'index de la zone "coordonée de vertex dans le program Shader
         this.attrib_vertex_coord_location = GLES20.glGetAttribLocation(
                 mGLSLProgram_location, this.VSH_ATTRIB_VERTEX_COORD);
+
         this.attrib_color_location = GLES20.glGetAttribLocation(
                 mGLSLProgram_location, this.VSH_ATTRIB_COLOR);
+
         this.attrib_texture_coord_location = GLES20.glGetAttribLocation(
                 this.mGLSLProgram_location, this.VSH_ATTRIB_TEXTURE_COORD);
 

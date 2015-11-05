@@ -16,7 +16,9 @@
 
     <string name="textureisoland">isoland.jpeg</string>
     <string name="texturespyro">spyro.png</string>
-    
+    <string name="mountains">mountains1.jpg</string>
+    <string name="circle">circle.png</string>
+
     <string name="bugalive">blue.png</string>
     <string name="bugdead">red.png</string>
  

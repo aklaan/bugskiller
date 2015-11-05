@@ -2,6 +2,7 @@ package com.rdupuis.bugskiller.scenes;
 
 import android.util.Log;
 
+import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.rdupuis.bugskiller.R;
@@ -43,22 +44,28 @@ public class Scene01 extends Scene {
 
         background.setTagName(TAG_BACKGROUND);
         background.disableColision();
-        this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
+
+
+     //   this.getBitmapProvider().linkTexture(R.string.mountains, background);
+//        this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
         //this.addToScene(background);
 
         //BUG
-        Bug bug = new Bug(this.getBitmapProvider().getTexture(R.string.bugalive), this.getBitmapProvider().getTexture(R.string.bugdead));
-        bug.setWidth(50);
-        bug.setHeight(50);
-        bug.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
-        bug.setTagName(TAG_BUG);
-        this.addToScene(bug);
+        for (int i = 1; i < 10 ;i++) {
+            Bug bug = new Bug(this.getBitmapProvider().getTexture(R.string.bugalive), this.getBitmapProvider().getTexture(R.string.bugdead));
+            bug.setWidth(50);
+            bug.setHeight(50);
+            bug.setCoord((float) (this.getWidth() / 2) + i * 30, (float) (this.getHeight() / 2) + i * 30);
+            bug.setTagName(TAG_BUG);
 
+            //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
+            this.addToScene(bug);
 
+        }
         //BUTTON
         //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(450, 150, 200, 100, this.getBitmapProvider().getTexture(R.string.bugalive),
+        button = new Button(450, 150, 200, 100, this.getBitmapProvider().getTexture(R.string.circle),
                 this.getBitmapProvider().getTexture(R.string.bugdead));
         button.setTagName(TAG_BUTTON);
         button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
@@ -101,9 +108,21 @@ public class Scene01 extends Scene {
     public void loadTextures() {
 
         String imageFolder = this.getActivity().getString(R.string.imagesfolder);
-        this.getBitmapProvider().add(imageFolder, R.string.textureisoland);
-        this.getBitmapProvider().add(imageFolder, R.string.texturespyro);
+    //    this.getBitmapProvider().add(imageFolder, R.string.textureisoland);
+    //    this.getBitmapProvider().add(imageFolder, R.string.texturespyro);
         this.getBitmapProvider().add(imageFolder, R.string.bugalive);
         this.getBitmapProvider().add(imageFolder, R.string.bugdead);
+    //    this.getBitmapProvider().add(imageFolder, R.string.mountains);
+        this.getBitmapProvider().add(imageFolder, R.string.circle);
+    }
+
+
+    @Override
+    public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
+        super.onSurfaceCreated(gl2, eglConfig);
+
+        GameObject go = this.getGameObjectByTag(this.TAG_BUG);
+        this.loadVBO(go, 0);
+
     }
 }

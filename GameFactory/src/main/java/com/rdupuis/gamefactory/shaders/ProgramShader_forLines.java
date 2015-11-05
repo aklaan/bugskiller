@@ -35,9 +35,9 @@ public class ProgramShader_forLines extends ProgramShader {
 
                        // + " varying vec2 vTexCoord; "
                         + " varying vec4 vColor;"
-                        + " varying vec3 pos;"
+            //            + " varying vec3 pos;"
                         + " void main() {"
-                   //      + "    gl_FragColor =  vColor;"
+     //                    + "    gl_FragColor =  vColor;"
                        + "    gl_FragColor =  vec4(1.,0.,1.,1.0);"
 
                         + "}";
@@ -53,7 +53,7 @@ public class ProgramShader_forLines extends ProgramShader {
                         + " vec4 position = "+this.VSH_UNIFORM_MVP+" * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
                       //  + "vec4 position = vec4(aPosition.xyz, 1.);"
                         + " vColor = " + this.VSH_ATTRIB_COLOR + ";"
-                        + " gl_PointSize = 1.0;"
+                     //   + " gl_PointSize = 1.0;"
                         // cette commande doit toujours �tre la derni�re du vertex shader.
                         + "	gl_Position =  position;"
                         + "}";
@@ -78,6 +78,7 @@ public class ProgramShader_forLines extends ProgramShader {
     // *******************************************************************
     // Attention : il ne faut pas rendre enable un attribut non valoris�
     // sinon c'est ecran noir !
+    @Override
     public void enableShaderVar() {
         GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glEnableVertexAttribArray(this.attrib_color_location);
@@ -85,6 +86,7 @@ public class ProgramShader_forLines extends ProgramShader {
     }
 
     // **************************************************************************
+    @Override
     public void disableShaderVar() {
         GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glDisableVertexAttribArray(this.attrib_color_location);

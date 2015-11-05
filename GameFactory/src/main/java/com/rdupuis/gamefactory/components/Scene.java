@@ -1,5 +1,9 @@
 package com.rdupuis.gamefactory.components;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -23,6 +27,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
     public final static String TAG_ERROR = "CRITICAL ERROR";
     private static int glbufferTextureID;
+    public int[] vbo;
     public OpenGLActivity mActivity;
     private boolean working = false;
     public ProgramShaderProvider mProgramShaderProvider;
@@ -91,7 +96,7 @@ public class Scene implements GLSurfaceView.Renderer {
         loadGameObjects();
     }
 
-    // @Override
+     @Override
     public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
 
         // on ne peux pas créer de programe Shader en dehors du contexte
@@ -100,15 +105,14 @@ public class Scene implements GLSurfaceView.Renderer {
         initProgramShader();
 
         //on défini la couleur de base pour initialiser le BUFFER
-        // a chaque fois que l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        //on va remplir le buffer avec la couleur pré-définie ici
+        // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        // on va remplir le back buffer avec la couleur pré-définie ici
         GLES20.glClearColor(0.3f, 0.2f, 0.2f, 1.0f);
 
         // on active le texturing 2D
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
 
         // Activattion de la gestion de l'Alpha
-
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         GLES20.glEnable(GLES20.GL_BLEND);
 
@@ -118,20 +122,33 @@ public class Scene implements GLSurfaceView.Renderer {
         GLES20.glFrontFace(GL10.GL_CCW);
 
         // on indique quelle face à oculter (par défaut c'est BACK)
- //       GLES20.glCullFace(GL10.GL_BACK);
+        //       GLES20.glCullFace(GL10.GL_BACK);
 
         // Activation du Culling
+        // je l'ai désactivé ici car on ne s'en sert pas
+        // c'est ça en moins à calculer donc c'est sans doute un gain de perf.
 //        GLES20.glEnable(GL10.GL_CULL_FACE);
 
-        GLES20.glLineWidth(4.f);
-        //
+        // pour l'affichage en mode GL_LINES
+        GLES20.glLineWidth(1.f);
 
+        /**
+         * test sur les VBO
+         */
+
+        //on crée un tableau qui va référencer les buffer vbo
+        vbo = new int[1];
+        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
+        GLES20.glGenBuffers(1, vbo, 0);
+
+        /**
+         *
+         */
         // create texture handle
         int[] textures = new int[1];
 
         // on génère un buffer texture utilisable par OPENGL
         GLES20.glGenTextures(1, textures, 0);
-
         glbufferTextureID = textures[0];
 
         // on demande à opengl d'utiliser la première texture
@@ -463,5 +480,24 @@ public class Scene implements GLSurfaceView.Renderer {
                 .getDisplayMetrics();
         return metrics.widthPixels;
     }
+
+    /**
+     * pour leq test indexbuffer est toujours à zéro vu que c'est un tableau de 1
+     * @param gameObject
+     * @param indexBuffer
+     */
+    public void loadVBO(GameObject gameObject , int indexBuffer) {
+        //on se place sur le premier buffer référencé dans le tableau
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.vbo[indexBuffer]);
+        //on charge les données
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getFbVertices().capacity(), gameObject.getFbVertices(), GLES20.GL_STATIC_DRAW);
+
+        //unbind
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
+
+    }
+
 
 }

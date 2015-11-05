@@ -2,6 +2,7 @@ package com.rdupuis.gamefactory.animations;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * l'animationManager exécute les animations d'une scène
@@ -11,19 +12,23 @@ public class AnimationManager {
 
     private final ArrayList<AnimationManagerListener> mEventListenerList = new ArrayList<AnimationManagerListener>();
     private Animation.AnimationStatus mStatus;
-    private ArrayList<Animation> mAnimationList;
+    //CopyOnWriteArrayList est une ArrayList mais safe-thead
+    //si on utilise un arraylist simple on risque de planter en concurrence d'écriture
+    //lorsque l'on fait les remove
+    private CopyOnWriteArrayList<Animation> mAnimationList;
 
     public AnimationManager() {
-        this.mAnimationList = new ArrayList<Animation>();
+        this.mAnimationList = new CopyOnWriteArrayList<Animation>();
         this.mStatus = Animation.AnimationStatus.STOPPED;
     }
 
-    public ArrayList<Animation> getAnimationList() {
+    public CopyOnWriteArrayList<Animation> getAnimationList() {
         return this.mAnimationList;
     }
 
     /**
      * Ajout d'un listener
+     *
      * @param listener
      */
     public void addListener(AnimationManagerListener listener) {
@@ -34,7 +39,7 @@ public class AnimationManager {
     /***********************************************
      * Traiter l'animation si elle existe
      **********************************************/
-    public void playAnimations() {
+    public synchronized void playAnimations() {
         // -----------------------------------------
         // traiter les animations
         // --------------------------------------------------------
@@ -45,7 +50,9 @@ public class AnimationManager {
                 animation.play();
             // traiter les actions suplémentaires lors de la lecture
             //   onAnimationPlay();
+        }
 
+        for (Animation animation : this.getAnimationList()) {
 
             if (animation.getStatus() == Animation.AnimationStatus.STOPPED) {
                 this.getAnimationList().remove(animation);
@@ -54,6 +61,7 @@ public class AnimationManager {
                 // traiter les actions suplémentaires a la fin de la lecture
                 //     onAnimationStop();
             }
+
 
         }
         updateEvent();
@@ -115,6 +123,7 @@ public class AnimationManager {
 
     /**
      * Permet d'ajouter une animation à jouer
+     *
      * @param animation
      */
     public void addAnimation(Animation animation) {
@@ -130,6 +139,7 @@ public class AnimationManager {
 
     /**
      * Permet de savoir si une animation est déjà présente dans la liste des animations jouée en cours
+     *
      * @param animation
      * @return
      */

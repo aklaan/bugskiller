@@ -280,7 +280,12 @@ public class GameObject implements Drawable, Cloneable {
         this.getIndices().rewind();
 
         // on charge les coordonn�es des vertices
+
         sh.setVerticesCoord(this.getFbVertices());
+if (this.getTagName() == "aaaaaaaaaaaaascene1:bug"){
+    sh.setVBOVerticesCoord(this.getScene().vbo[0]);
+}
+
         this.getFbVertices().rewind();
 
         // on charge les coordon�es de texture
@@ -309,7 +314,6 @@ public class GameObject implements Drawable, Cloneable {
                 GLES20.GL_FLOAT, false, Vertex.Vertex_TEXT_SIZE_BYTES, toto);
 
 
-
         float[] mMvp = new float[16];
 
         if (this.viewMode == "ORTHO") {
@@ -332,10 +336,8 @@ public class GameObject implements Drawable, Cloneable {
         this.getIndices().rewind();
 
 
-
-
         GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
-              GLES20.GL_UNSIGNED_SHORT, this.getIndices());
+                GLES20.GL_UNSIGNED_SHORT, this.getIndices());
 
         // renderer.mProgramme1.disableVertexAttribArray();
         // �quivalent du POP
@@ -570,4 +572,8 @@ public class GameObject implements Drawable, Cloneable {
         this.alpha = (alpha < 0) ? 0 : alpha;
         this.alpha = (alpha > 1) ? 1 : alpha;
     }
+
+
+
+
 }

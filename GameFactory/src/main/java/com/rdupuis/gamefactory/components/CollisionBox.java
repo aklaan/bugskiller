@@ -24,7 +24,7 @@ public class CollisionBox extends Rectangle2D {
 
     public CollisionBox(GameObject go) {
         super(DrawingMode.EMPTY);
-        this.isVisible = true;
+        this.isVisible = false;
         this.drawMode = GLES20.GL_LINES;
         this.mWorldVertices = new ArrayList<Vertex>();
         this.offsetX = -3.0f;
@@ -165,7 +165,7 @@ public class CollisionBox extends Rectangle2D {
         // qui indiquent dans quel ordre les vertex doivent être dessinés
         this.getIndices().rewind();
 
-        GLES20.glDrawElements(GLES20.GL_LINES, this.getIndices().capacity(),
+        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
                 GLES20.GL_UNSIGNED_SHORT, this.getIndices());
 
         // renderer.mProgramme1.disableVertexAttribArray();
