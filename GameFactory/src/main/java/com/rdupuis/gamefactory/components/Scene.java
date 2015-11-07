@@ -28,6 +28,8 @@ public class Scene implements GLSurfaceView.Renderer {
     public final static String TAG_ERROR = "CRITICAL ERROR";
     private static int glbufferTextureID;
     public int[] vbo;
+    public int[] vboi;
+
     public OpenGLActivity mActivity;
     private boolean working = false;
     public ProgramShaderProvider mProgramShaderProvider;
@@ -141,7 +143,13 @@ public class Scene implements GLSurfaceView.Renderer {
         //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
         GLES20.glGenBuffers(1, vbo, 0);
 
-        /**
+         //on crée un tableau qui va référencer les buffer vboi
+         vboi = new int[1];
+         //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
+         GLES20.glGenBuffers(1, vboi, 0);
+
+
+         /**
          *
          */
         // create texture handle
@@ -499,5 +507,18 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
+    public void loadVBOi(GameObject gameObject , int indexBuffer) {
+        //on se place sur le premier buffer référencé dans le tableau
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.vboi[indexBuffer]);
+        //on charge les données
+        //target - size - data - usage
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, gameObject.getIndices().capacity(), gameObject.getIndices(), GLES20.GL_STATIC_DRAW);
+
+        //unbind
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
+
+    }
 
 }

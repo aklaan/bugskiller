@@ -183,12 +183,13 @@ public class ProgramShader {
     public void setVBOVerticesCoord(int VboBufferIndex) {
         //on se positionne sur le buffer souhaité
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VboBufferIndex);
-        //on active l'utilisation de la variable aPostion dans le shader
-        GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
-        //plutôt qur de passer des valeur au shader, on passe un pointeur vers le buffer
 
+        //plutôt qur de passer des valeur au shader, on passe un pointeur vers le buffer
         GLES20.glVertexAttribPointer(this.attrib_vertex_coord_location, 3,
                 GLES20.GL_FLOAT, false, 0, 0);
+
+        //on active l'utilisation de la variable aPostion dans le shader
+        GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
 
     }
 

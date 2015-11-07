@@ -282,9 +282,6 @@ public class GameObject implements Drawable, Cloneable {
         // on charge les coordonn�es des vertices
 
         sh.setVerticesCoord(this.getFbVertices());
-if (this.getTagName() == "aaaaaaaaaaaaascene1:bug"){
-    sh.setVBOVerticesCoord(this.getScene().vbo[0]);
-}
 
         this.getFbVertices().rewind();
 
@@ -336,8 +333,41 @@ if (this.getTagName() == "aaaaaaaaaaaaascene1:bug"){
         this.getIndices().rewind();
 
 
-        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
-                GLES20.GL_UNSIGNED_SHORT, this.getIndices());
+        if (this.getTagName() == "scene1:bug") {
+
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().vbo[0]);
+            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, this.getFbVertices().capacity() * FLOAT_SIZE, this.getFbVertices(), GLES20.GL_STATIC_DRAW);
+
+            //plutôt qur de passer des valeur au shader, on passe un pointeur vers le buffer
+            GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, 3,
+                    GLES20.GL_FLOAT, false, 0, 0);
+
+            //on active l'utilisation de la variable aPostion dans le shader
+            GLES20.glEnableVertexAttribArray(sh.attrib_vertex_coord_location);
+
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
+
+            //on charge les données
+            //target = un buffer ELEMENT_ARRAY dans mémoire graphique
+            //size = la taille du buffer = le nombre d'indices à stocker * la taille d'un SHORT
+            //data = les données
+            //usage :   GL_STATIC_DRAW : les données sont lues une fois et sont réutilisée a chaque frame
+            //       ou GL_DYNAMIC_DRAW : les données sont lues a chaque frame
+            GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getIndices().capacity() * SHORT_SIZE, this.getIndices(), GLES20.GL_STATIC_DRAW);
+
+
+            GLES20.glDrawElements(GLES20.GL_LINES, this.getIndices().capacity(),
+                    GLES20.GL_UNSIGNED_SHORT, 0);
+
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        } else {
+
+
+            GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
+                    GLES20.GL_UNSIGNED_SHORT, this.getIndices());
+        }
 
         // renderer.mProgramme1.disableVertexAttribArray();
         // �quivalent du POP
@@ -572,8 +602,6 @@ if (this.getTagName() == "aaaaaaaaaaaaascene1:bug"){
         this.alpha = (alpha < 0) ? 0 : alpha;
         this.alpha = (alpha > 1) ? 1 : alpha;
     }
-
-
 
 
 }

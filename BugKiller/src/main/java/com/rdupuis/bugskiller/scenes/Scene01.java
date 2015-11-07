@@ -46,12 +46,12 @@ public class Scene01 extends Scene {
         background.disableColision();
 
 
-     //   this.getBitmapProvider().linkTexture(R.string.mountains, background);
+        //   this.getBitmapProvider().linkTexture(R.string.mountains, background);
 //        this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
         //this.addToScene(background);
 
         //BUG
-        for (int i = 1; i < 10 ;i++) {
+        for (int i = 1; i < 10; i++) {
             Bug bug = new Bug(this.getBitmapProvider().getTexture(R.string.bugalive), this.getBitmapProvider().getTexture(R.string.bugdead));
             bug.setWidth(50);
             bug.setHeight(50);
@@ -108,11 +108,11 @@ public class Scene01 extends Scene {
     public void loadTextures() {
 
         String imageFolder = this.getActivity().getString(R.string.imagesfolder);
-    //    this.getBitmapProvider().add(imageFolder, R.string.textureisoland);
-    //    this.getBitmapProvider().add(imageFolder, R.string.texturespyro);
+        //    this.getBitmapProvider().add(imageFolder, R.string.textureisoland);
+        //    this.getBitmapProvider().add(imageFolder, R.string.texturespyro);
         this.getBitmapProvider().add(imageFolder, R.string.bugalive);
         this.getBitmapProvider().add(imageFolder, R.string.bugdead);
-    //    this.getBitmapProvider().add(imageFolder, R.string.mountains);
+        //    this.getBitmapProvider().add(imageFolder, R.string.mountains);
         this.getBitmapProvider().add(imageFolder, R.string.circle);
     }
 
@@ -123,6 +123,6 @@ public class Scene01 extends Scene {
 
         GameObject go = this.getGameObjectByTag(this.TAG_BUG);
         this.loadVBO(go, 0);
-
+        this.loadVBOi(go, 0);
     }
 }
