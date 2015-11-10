@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.rdupuis.gamefactory.R;
 import com.rdupuis.gamefactory.components.GameObject;
+import com.rdupuis.gamefactory.components.Texture;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
@@ -213,13 +214,16 @@ public class Starship extends Rectangle2D {
 				for (GameObject collider : go.mCollideWithList) {
 
 					if (collider.getTagName() == String.valueOf(R.string.petit_robot)) {
-						newTextureId = R.string.textureRobot;
+						this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.textureRobot));
+
 					}
 
 				}
 
 			} else {
-				newTextureId = R.string.boulerouge;
+				this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.boulerouge));
+
+
 			}
 
 		}
@@ -227,6 +231,7 @@ public class Starship extends Rectangle2D {
 	}
 
 	public void onAnimationPlay() {
-		newTextureId = R.string.textureRobot;
+
+		this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.textureRobot));
 	}
 }

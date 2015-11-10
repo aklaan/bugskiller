@@ -1,6 +1,5 @@
 package com.rdupuis.gamefactory.utils;
 
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -17,7 +16,6 @@ public class CollisionControler {
 
 
         for (GameObject gameObject : mGameObjectList) {
-//            Log.e("colideCtrl", gameObject.getTagName());
             gameObject.mCollideWithList.clear();
 
 
@@ -34,8 +32,6 @@ public class CollisionControler {
 
                         if (checkCollision(go.mCollisionBox,
                                 gameObject.mCollisionBox)) {
-  //                          Log.e("check_colide", gameObject.getTagName() + " colide with " + go.getTagName());
-                            //gameObject.mCollideWithList.add(go.mCollisionBox);
                             gameObject.mCollideWithList.add(go);
                         }
 
@@ -49,13 +45,6 @@ public class CollisionControler {
 
     static boolean checkCollision(CollisionBox a, CollisionBox b) {
         return SAT.isColide(a, b);
-        /**
-         * if (a == b || (a.getCoordX() >= b.getCoordX() + b.getWidth())
-         * // trop à droite || (a.getCoordX() + a.getWidth() <= b.getCoordX()) //
-         * trop à // gauche || (a.getCoordY() >= b.getCoordY() + b.getHeight())
-         * // trop en // bas || (a.getCoordY() + a.getHeight() <= b.getCoordY())
-         * // trop en ) // haut return false; else return true;
-         */
     }
 
 

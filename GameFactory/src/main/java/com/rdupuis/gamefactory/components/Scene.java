@@ -1,43 +1,38 @@
 package com.rdupuis.gamefactory.components;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-
-import com.rdupuis.gamefactory.animations.AnimationManager;
-import com.rdupuis.gamefactory.components.MySurfaceView.ScreenEvent;
-import com.rdupuis.gamefactory.providers.BitmapProvider;
-import com.rdupuis.gamefactory.providers.ProgramShaderProvider;
-import com.rdupuis.gamefactory.utils.CollisionControler;
-
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
-import android.util.Log;
+
+import com.rdupuis.gamefactory.animations.AnimationManager;
+import com.rdupuis.gamefactory.providers.ProgramShaderProvider;
+import com.rdupuis.gamefactory.providers.TextureProvider;
+import com.rdupuis.gamefactory.utils.CollisionControler;
+
+import java.util.ArrayList;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 public class Scene implements GLSurfaceView.Renderer {
+    public enum VIEW_MODE {ORTHO, CAMERA}
+
 
     public final static String TAG_ERROR = "CRITICAL ERROR";
-    private static int glbufferTextureID;
+
     public int[] vbo;
     public int[] vboi;
 
+
+    private VIEW_MODE mViewMode;
     public OpenGLActivity mActivity;
-    private boolean working = false;
     public ProgramShaderProvider mProgramShaderProvider;
-    public BitmapProvider mBitmapProvider;
+    public TextureProvider mTextureProvider;
     private ArrayList<GameObject> mGameObjectList;
     private AnimationManager animationManager;
     public final float[] mVMatrix = new float[16];
-
     public final float[] mVMatrixORTH = new float[16];
 
     // Matrice de projection de la vue
@@ -53,9 +48,11 @@ public class Scene implements GLSurfaceView.Renderer {
     public Scene(OpenGLActivity activity) {
 
         mActivity = activity;
+        //par defaut on est en mode de vue Orthogonale
+        this.mViewMode = VIEW_MODE.ORTHO;
         // le bitmap provider peu servir pour plusieurs scene
         // on le remonte donc au plus haut.
-        this.mBitmapProvider = new BitmapProvider(this.getActivity());
+        this.mTextureProvider = new TextureProvider(this.getActivity());
         this.mGameObjectList = new ArrayList<GameObject>();
         this.mProgramShaderProvider = new ProgramShaderProvider(mActivity);
         this.mCamera = new Camera();
@@ -69,6 +66,15 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
+    public VIEW_MODE getViewMode() {
+        return mViewMode;
+    }
+
+    public void setViewMode(VIEW_MODE mViewMode) {
+        this.mViewMode = mViewMode;
+    }
+
+
     public AnimationManager getAnimationManager() {
         return this.animationManager;
     }
@@ -77,8 +83,8 @@ public class Scene implements GLSurfaceView.Renderer {
         return this.mActivity;
     }
 
-    public BitmapProvider getBitmapProvider() {
-        return this.mBitmapProvider;
+    public TextureProvider getTextureProvider() {
+        return this.mTextureProvider;
     }
 
     public ProgramShaderProvider getProgramShaderProvider() {
@@ -98,21 +104,20 @@ public class Scene implements GLSurfaceView.Renderer {
         loadGameObjects();
     }
 
-     @Override
+    @Override
     public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
 
         // on ne peux pas créer de programe Shader en dehors du contexte
         // opengl. donc le provider est à recréer à chaque load de la scène
 
         initProgramShader();
+        this.getTextureProvider().initGlTextureParam();
 
         //on défini la couleur de base pour initialiser le BUFFER
         // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         // on va remplir le back buffer avec la couleur pré-définie ici
         GLES20.glClearColor(0.3f, 0.2f, 0.2f, 1.0f);
 
-        // on active le texturing 2D
-        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
 
         // Activattion de la gestion de l'Alpha
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -143,45 +148,15 @@ public class Scene implements GLSurfaceView.Renderer {
         //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
         GLES20.glGenBuffers(1, vbo, 0);
 
-         //on crée un tableau qui va référencer les buffer vboi
-         vboi = new int[1];
-         //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
-         GLES20.glGenBuffers(1, vboi, 0);
+        //on crée un tableau qui va référencer les buffer vboi
+        vboi = new int[1];
+        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
+        GLES20.glGenBuffers(1, vboi, 0);
 
 
-         /**
+        /**
          *
          */
-        // create texture handle
-        int[] textures = new int[1];
-
-        // on génère un buffer texture utilisable par OPENGL
-        GLES20.glGenTextures(1, textures, 0);
-        glbufferTextureID = textures[0];
-
-        // on demande à opengl d'utiliser la première texture
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glbufferTextureID);
-
-        // définition des paramètres de magnification et minification des
-        // texture
-        // on indique GL_NEAREST pour dire que l'on doit prendre le pixel qui se
-        // rapporche le plus
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-
-        // paramétrage du dépassement des coordonées de texture
-        // GL_CLAMP_TO_EDGE = on étire la texture pour recouvrir la forme
-        // on peu aussi mettre un paramètre pour répéter la texture ou bien
-        // effectuer un mirroir
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
 
     }
 
@@ -245,63 +220,15 @@ public class Scene implements GLSurfaceView.Renderer {
         // on vide le buffer.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        /**
-         * ici on joue sur les évènements déterminés par la SurfaceView pour
-         * contrôler la position de la caméra
-         */
-        float incX = 0;
-        float incY = 0;
-
-        switch (this.getActivity().getSurfaceView().getScreenEvent()) {
-
-            case SCROLL_H_RIGHT:
-                incX = +2f;
-                break;
-
-            case SCROLL_H_LEFT:
-                incX = -2f;
-                break;
-
-
-            case SCROLL_V_UP:
-                incY = +2f;
-                break;
-
-            case SCROLL_V_DOWN:
-                incY = -2f;
-                break;
-
-            default:
-                break;
-
-        }
-
-        float limitX_RIGHT = +80;
-        float limitX_LEFT = -80;
-
-        this.mCamera.centerX += incX;
-        this.mCamera.centerX = (this.mCamera.centerX > limitX_RIGHT) ? limitX_RIGHT : this.mCamera.centerX;
-        this.mCamera.centerX = (this.mCamera.centerX < limitX_LEFT) ? limitX_LEFT : this.mCamera.centerX;
-        this.mCamera.eyeX = this.mCamera.centerX;
-
-        float limitY_UP = +100;
-        float limitY_DOWN = -100;
-
-        this.mCamera.centerY = (this.mCamera.centerY > limitY_UP) ? limitY_UP : this.mCamera.centerY;
-        this.mCamera.centerY = (this.mCamera.centerY < limitY_DOWN) ? limitY_DOWN : this.mCamera.centerY;
-
-
-        this.mCamera.centerY += incY;
-        this.mCamera.eyeY = this.mCamera.centerY;
-
 
         /***************************************************************************************
          * Calcul de la Matrice de VIEW : mVMatrix
          *************************************************************************************/
-        Matrix.setLookAtM(mVMatrix, 0, mCamera.centerX, mCamera.centerY, mCamera.centerZ,
-                mCamera.eyeX, mCamera.eyeY, mCamera.eyeZ,
-                mCamera.orientX, mCamera.orientY, mCamera.orientZ);
-
+        if (this.getViewMode() == VIEW_MODE.CAMERA) {
+            Matrix.setLookAtM(mVMatrix, 0, mCamera.centerX, mCamera.centerY, mCamera.centerZ,
+                    mCamera.eyeX, mCamera.eyeY, mCamera.eyeZ,
+                    mCamera.orientX, mCamera.orientY, mCamera.orientZ);
+        }
 
         // Calculate the projection and view transformation
         // Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
@@ -404,7 +331,7 @@ public class Scene implements GLSurfaceView.Renderer {
      * @param gameobject
      */
     public void addToScene(GameObject gameobject) {
-        gameobject.mScene = this;
+        gameobject.setScene(this);
         this.mGameObjectList.add(gameobject);
 
     }
@@ -415,7 +342,7 @@ public class Scene implements GLSurfaceView.Renderer {
      * @param gameobject
      */
     public void removeFromScene(GameObject gameobject) {
-        gameobject.mScene = null;
+        gameobject.setScene(null);
         this.mGameObjectList.remove(gameobject);
 
     }
@@ -427,7 +354,7 @@ public class Scene implements GLSurfaceView.Renderer {
      */
     public void addToScene(ArrayList<GameObject> GameObjectList) {
         for (GameObject go : GameObjectList) {
-            go.mScene = this;
+            go.setScene(this);
         }
         this.mGameObjectList.addAll(GameObjectList);
     }
@@ -491,10 +418,11 @@ public class Scene implements GLSurfaceView.Renderer {
 
     /**
      * pour leq test indexbuffer est toujours à zéro vu que c'est un tableau de 1
+     *
      * @param gameObject
      * @param indexBuffer
      */
-    public void loadVBO(GameObject gameObject , int indexBuffer) {
+    public void loadVBO(GameObject gameObject, int indexBuffer) {
         //on se place sur le premier buffer référencé dans le tableau
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.vbo[indexBuffer]);
         //on charge les données
@@ -507,7 +435,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
-    public void loadVBOi(GameObject gameObject , int indexBuffer) {
+    public void loadVBOi(GameObject gameObject, int indexBuffer) {
         //on se place sur le premier buffer référencé dans le tableau
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.vboi[indexBuffer]);
         //on charge les données
@@ -521,4 +449,56 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
+    private void updateCamera() {
+        /**
+         * ici on joue sur les évènements déterminés par la SurfaceView pour
+         * contrôler la position de la caméra
+         */
+        float incX = 0;
+        float incY = 0;
+
+        switch (this.getActivity().getSurfaceView().getScreenEvent()) {
+
+            case SCROLL_H_RIGHT:
+                incX = +2f;
+                break;
+
+            case SCROLL_H_LEFT:
+                incX = -2f;
+                break;
+
+
+            case SCROLL_V_UP:
+                incY = +2f;
+                break;
+
+            case SCROLL_V_DOWN:
+                incY = -2f;
+                break;
+
+            default:
+                break;
+
+        }
+
+        float limitX_RIGHT = +80;
+        float limitX_LEFT = -80;
+
+        this.mCamera.centerX += incX;
+        this.mCamera.centerX = (this.mCamera.centerX > limitX_RIGHT) ? limitX_RIGHT : this.mCamera.centerX;
+        this.mCamera.centerX = (this.mCamera.centerX < limitX_LEFT) ? limitX_LEFT : this.mCamera.centerX;
+        this.mCamera.eyeX = this.mCamera.centerX;
+
+        float limitY_UP = +100;
+        float limitY_DOWN = -100;
+
+        this.mCamera.centerY = (this.mCamera.centerY > limitY_UP) ? limitY_UP : this.mCamera.centerY;
+        this.mCamera.centerY = (this.mCamera.centerY < limitY_DOWN) ? limitY_DOWN : this.mCamera.centerY;
+
+
+        this.mCamera.centerY += incY;
+        this.mCamera.eyeY = this.mCamera.centerY;
+
+
+    }
 }

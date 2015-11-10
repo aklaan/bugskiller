@@ -7,20 +7,20 @@
     <!-- nom des objets -->
     
 
-    <string name="background">background</string>
-    <string name="spyro">spyro</string>
+    <string name="background">images/background</string>
+    <string name="spyro">images/spyro</string>
     
     <string name="USER_FINGER">USER_FINGER</string>
     
     <!-- nom des textures -->
 
-    <string name="textureisoland">isoland.jpeg</string>
-    <string name="texturespyro">spyro.png</string>
-    <string name="mountains">mountains1.jpg</string>
-    <string name="circle">circle.png</string>
+    <string name="textureisoland">images/isoland.jpeg</string>
+    <string name="texturespyro">images/spyro.png</string>
+    <string name="mountains">images/mountains1.jpg</string>
+    <string name="circle">images/circle.png</string>
 
-    <string name="bugalive">blue.png</string>
-    <string name="bugdead">red.png</string>
+    <string name="bugalive">images/blue.png</string>
+    <string name="bugdead">images/red.png</string>
  
     <!-- parametrage du projet -->
     

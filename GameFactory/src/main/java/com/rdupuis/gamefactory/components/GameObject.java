@@ -21,12 +21,25 @@ import javax.microedition.khronos.opengles.GL10;
 public class GameObject implements Drawable, Cloneable {
 
     private String mTagName;
-    public Texture mTexture;
-    public int newTextureId;
+    private Texture mTexture;
+
+    public Texture getTexture() {
+        return mTexture;
+    }
+
+    public void setTexture(Texture mTexture) {
+        this.mTexture = mTexture;
+    }
+
     public Boolean textureEnabled;
     public Boolean isVisible;
-    public Scene mScene;
-    public String viewMode = "ORTHO";
+
+    public void setScene(Scene mScene) {
+        this.mScene = mScene;
+    }
+
+    private Scene mScene;
+    //    public String viewMode = "ORTHO";
     private float alpha;
 
     // top permettant de savoir si l'objet est statique ou qu'il
@@ -99,16 +112,21 @@ public class GameObject implements Drawable, Cloneable {
     // constructeur
     public GameObject() {
 
-        //par d�faut l'Alpha est � 100%
+        //Valeurs par défaut :
+        //l'Alpha est à 100%
         this.setAlpha(1);
+
+        //pas de texture
         textureEnabled = false;
+        //pas de tagname
         mTagName = "";
+        //visible
         isVisible = true;
+        //la matrice de rotation est nulle
         Matrix.setIdentityM(this.mRotationMatrix, 0);
 
         this.mCollideWithList = new ArrayList<GameObject>();
         this.mGameObjectToListenList = new ArrayList<GameObject>();
-
         this.mVertices = new ArrayList<Vertex>();
 
 
@@ -211,10 +229,6 @@ public class GameObject implements Drawable, Cloneable {
         return mIndices;
     }
 
-    public void setTexture(Texture texture) {
-        mTexture = texture;
-
-    }
 
     public void onUpdate() {
 
@@ -275,6 +289,11 @@ public class GameObject implements Drawable, Cloneable {
 
         this.getScene().getProgramShaderProvider().use(sh);
 
+        if (this.textureEnabled) {
+            // on demande à opengl d'utiliser la texture
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
+        }
+
         // on se positionne au debut du Buffer des indices
         // qui indiquent dans quel ordre les vertex doivent �tre dessin�s
         this.getIndices().rewind();
@@ -313,7 +332,7 @@ public class GameObject implements Drawable, Cloneable {
 
         float[] mMvp = new float[16];
 
-        if (this.viewMode == "ORTHO") {
+        if (this.getScene().getViewMode() == Scene.VIEW_MODE.ORTHO) {
             Matrix.multiplyMM(this.mMvp, 0, this.getScene().mProjectionORTH, 0,
                     this.mModelView, 0);
 
@@ -414,12 +433,14 @@ public class GameObject implements Drawable, Cloneable {
     }
 
     // fabrique la nouvelle ModelView en fonction des modifications
-    // apport�es.
+    // apportées.
     public void updateModelView() {
         float[] wrkModelView = new float[16];
         float[] wrkRotationMatrix = new float[16];
-
-        if (this.viewMode == "ORTHO") {
+        //
+        // pas bien...on doit avoit une conftion directiement dans cene pour récupérér
+        //
+        if (this.getScene().getViewMode() == Scene.VIEW_MODE.ORTHO) {
             wrkModelView = this.getScene().mVMatrixORTH.clone();
 
         } else
@@ -436,7 +457,7 @@ public class GameObject implements Drawable, Cloneable {
     }
 
     /**
-     * Fonction de mise � jour g�n�rale
+     * Fonction de mise à jour générale
      *
      * @param openGLActivity
      */
@@ -481,10 +502,11 @@ public class GameObject implements Drawable, Cloneable {
          *
          * this.mTexture.textureNameID = newTextureId; }
          */
+        /*
         if (textureEnabled) {
-            this.getScene().getBitmapProvider()
+            this.getScene().getTextureProvider()
                     .putTextureToGLUnit(this.mTexture, 0);
-        }
+        }*/
 
     }
 

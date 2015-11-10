@@ -39,7 +39,7 @@ public class CollisionBox extends Rectangle2D {
     }
 
     public Scene getScene() {
-        return this.parent.mScene;
+        return this.parent.getScene();
     }
 
 
