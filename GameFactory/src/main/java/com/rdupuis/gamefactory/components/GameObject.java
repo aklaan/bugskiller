@@ -118,10 +118,13 @@ public class GameObject implements Drawable, Cloneable {
 
         //pas de texture
         textureEnabled = false;
+
         //pas de tagname
         mTagName = "";
+
         //visible
         isVisible = true;
+
         //la matrice de rotation est nulle
         Matrix.setIdentityM(this.mRotationMatrix, 0);
 
@@ -132,11 +135,16 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
+    /**
+     * @return
+     */
     public ArrayList<GameObject> getGameObjectToListenList() {
         return this.mGameObjectToListenList;
     }
 
-
+    /**
+     * @param nbIndex
+     */
     public void initBuffers(int nbIndex) {
         int nbVertex = mVertices.size();
 
@@ -163,24 +171,41 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
-    // setter vertices
-    public void putVertex(int index, Vertex vertex) {
-        // la position physique en m�moire des bytes qui repr�sentent le vertex
+    /**
+     * @param index
+     * @param vertex
+     */
+    public void putXYZIntoFbVertices(int index, Vertex vertex) {
+        // la position physique en mémoire des bytes qui représentent le vertex
         // c'est la taille d'un vertex en bytes x l'index
         mFbVertices.rewind();
-        // ici on se positionne dans le buffer � l'endroit o� l'on va ecrire le
+        // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
         // prochain vertex
         mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
         mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
-        // on se repositionne en 0 , pr�t pour la relecture
+        // on se repositionne en 0 , prêt pour la relecture
         mFbVertices.rewind();
 
-        mTextCoord.position(Vertex.Vertex_TEXT_SIZE * index);
-        mTextCoord.put(vertex.u).put(vertex.v);
-        // on se repositionne en 0 , pr�t pour la relecture
-        mTextCoord.rewind();
-
     }
+
+
+    /**
+     * insérer des bytes "u,v" dans le buffer des coordonnées de texture
+     *
+     * @param index
+     * @param vertex
+     */
+    public void putUVIntoFbTextCoord(int index, Vertex vertex) {
+        //on se place au debut du buffer
+        mTextCoord.rewind();
+        //on avance dans le buffer à l'endroit où on souhaite écrire
+        mTextCoord.position(Vertex.Vertex_TEXT_SIZE * index);
+        //on écrit les coordonées de texture
+        mTextCoord.put(vertex.u).put(vertex.v);
+        // on se repositionne en 0 , prêt pour la lecture
+        mTextCoord.rewind();
+    }
+
 
     public void rotate(float x, float y, float anglRAD) {
 
@@ -209,19 +234,33 @@ public class GameObject implements Drawable, Cloneable {
         return this.mScene;
     }
 
-    // getter vertices
+
     public FloatBuffer getFbVertices() {
 
         for (int i = 0; i < this.mVertices.size(); i++) {
-            this.putVertex(i, this.mVertices.get(i));
+            this.putXYZIntoFbVertices(i, this.mVertices.get(i));
         }
 
         return mFbVertices;
     }
 
+
+    /**
+     * @return
+     */
+    public FloatBuffer getFbTextCood() {
+
+        for (int i = 0; i < this.mVertices.size(); i++) {
+            this.putUVIntoFbTextCoord(i, this.mVertices.get(i));
+        }
+
+        return mTextCoord;
+    }
+
+
     // getter TextCoord
     public FloatBuffer getTextCoord() {
-        return mTextCoord;
+      return mTextCoord;
     }
 
     // getter indices
@@ -281,56 +320,28 @@ public class GameObject implements Drawable, Cloneable {
 
     // dessiner l'objet
     public void draw() {
-//		ProgramShader_simple sh = (ProgramShader_simple) this.getScene()
-//				.getProgramShaderProvider().getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
-
+        // j'utilise le shader prévu
         ProgramShader sh = this.getScene()
                 .getProgramShaderProvider().getShaderByName("simple");
 
         this.getScene().getProgramShaderProvider().use(sh);
 
+        getFbTextCood();
         if (this.textureEnabled) {
             // on demande à opengl d'utiliser la texture
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
+            sh.setTextureCoord(getTextCoord());
+            //GLES20.glEnableVertexAttribArray(sh.attrib_texture_coord_location);
+
         }
 
-        // on se positionne au debut du Buffer des indices
-        // qui indiquent dans quel ordre les vertex doivent �tre dessin�s
-        this.getIndices().rewind();
-
-        // on charge les coordonn�es des vertices
-
-        sh.setVerticesCoord(this.getFbVertices());
-
-        this.getFbVertices().rewind();
 
         // on charge les coordon�es de texture
 
-        sh.setTextureCoord(this.getTextCoord());
+
         //--------------------------------------------
         sh.enableShaderVar();
 
-
-        // if (sh.attrib_color_location != -1) {
-        // this.getVertices().position(0);
-        // GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
-        // GLES20.GL_FLOAT, false, Vertex.Vertex_TEXT_SIZE_BYTES, color);
-        float[] color = new float[4];
-        color[0] = 1.f;
-        color[1] = 0.f;
-        color[2] = 1.f;
-        color[3] = 0.5f;
-
-        FloatBuffer toto = ByteBuffer.allocateDirect(4 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        toto.put(color);
-
-
-        GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
-                GLES20.GL_FLOAT, false, Vertex.Vertex_TEXT_SIZE_BYTES, toto);
-
-
-        float[] mMvp = new float[16];
 
         if (this.getScene().getViewMode() == Scene.VIEW_MODE.ORTHO) {
             Matrix.multiplyMM(this.mMvp, 0, this.getScene().mProjectionORTH, 0,
@@ -345,48 +356,30 @@ public class GameObject implements Drawable, Cloneable {
         // une matrice de 4 flotant.
         GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, this.mMvp, 0);
 
-
         GLES20.glUniform1f(sh.uniform_alpha_location, this.getAlpha());
-        // on se positionne au debut du Buffer des indices
-        // qui indiquent dans quel ordre les vertex doivent �tre dessin�s
-        this.getIndices().rewind();
+
+        //je me place sur le vbo
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().vbo[0]);
+
+        //on active l'utilisation de la variable aPostion dans le shader
+        GLES20.glEnableVertexAttribArray(sh.attrib_vertex_coord_location);
+
+        //plutôt qur de passer des valeur au shader, on passe un pointeur vers le buffer
+        GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, 3,
+                GLES20.GL_FLOAT, false, 0, 0);
 
 
-        if (this.getTagName() == "scene1:bug") {
+        //je me place sur le buffer des index
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
 
-            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().vbo[0]);
-            GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, this.getFbVertices().capacity() * FLOAT_SIZE, this.getFbVertices(), GLES20.GL_STATIC_DRAW);
+        //je dessine les vertex selon l'ordre indiqué dans l'index
+        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
+                GLES20.GL_UNSIGNED_SHORT, 0);
 
-            //plutôt qur de passer des valeur au shader, on passe un pointeur vers le buffer
-            GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, 3,
-                    GLES20.GL_FLOAT, false, 0, 0);
+        //je pointe les buffer sur "rien" pour ne pas les réutiliser par erreur
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-            //on active l'utilisation de la variable aPostion dans le shader
-            GLES20.glEnableVertexAttribArray(sh.attrib_vertex_coord_location);
-
-            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
-
-            //on charge les données
-            //target = un buffer ELEMENT_ARRAY dans mémoire graphique
-            //size = la taille du buffer = le nombre d'indices à stocker * la taille d'un SHORT
-            //data = les données
-            //usage :   GL_STATIC_DRAW : les données sont lues une fois et sont réutilisée a chaque frame
-            //       ou GL_DYNAMIC_DRAW : les données sont lues a chaque frame
-            GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getIndices().capacity() * SHORT_SIZE, this.getIndices(), GLES20.GL_STATIC_DRAW);
-
-
-            GLES20.glDrawElements(GLES20.GL_LINES, this.getIndices().capacity(),
-                    GLES20.GL_UNSIGNED_SHORT, 0);
-
-            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
-            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
-        } else {
-
-
-            GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
-                    GLES20.GL_UNSIGNED_SHORT, this.getIndices());
-        }
 
         // renderer.mProgramme1.disableVertexAttribArray();
         // �quivalent du POP
@@ -402,6 +395,10 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
+    /**
+     * @param modelView
+     * @return
+     */
     public ArrayList<Vertex> applyModelView(float[] modelView) {
 
         // on r�cup�re les vertices de l'objet

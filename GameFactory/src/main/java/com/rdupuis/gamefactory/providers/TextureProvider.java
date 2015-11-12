@@ -54,6 +54,12 @@ public class TextureProvider {
         this.setActivity(activity);
     }
 
+
+    public void initialize() {
+        this.initGlTextureParam();
+        this.initGlBuffer();
+    }
+
     /**
      * add : Ajouter une nouvelle texture
      *
@@ -180,6 +186,35 @@ public class TextureProvider {
             // on se place au debut du buffer
             wrkTextureBuffer.rewind();
 
+            //on se positionne sur le buffer texture
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture.getGlBufferId());
+
+            //--------------------------------------------------------------
+            // définition des paramètres de magnification et minification des
+            // texture
+            // on indique GL_NEAREST pour dire que l'on doit prendre le pixel qui se
+            // rapporche le plus
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+                    GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+
+            // paramétrage du dépassement des coordonées de texture
+            // GL_CLAMP_TO_EDGE = on étire la texture pour recouvrir la forme
+            // on peu aussi mettre un paramètre pour répéter la texture ou bien
+            // effectuer un mirroir
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+                    GLES20.GL_CLAMP_TO_EDGE);
+
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+                    GLES20.GL_CLAMP_TO_EDGE);
+
+
+            //------------------------------------------------------------
+
+
             //on ecrit dans le buffer
             GLES20.glTexImage2D(GL10.GL_TEXTURE_2D, texture.getGlBufferId(), GL10.GL_RGBA,
                     texture.getWidth(), texture.getHeight(), 0, GL10.GL_RGBA,
@@ -188,35 +223,15 @@ public class TextureProvider {
             indx++;
         }
 
-
     }
 
     public void initGlTextureParam() {
 
         // on active le texturing 2D
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+        //on active l'unité de traitement des textures 0
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 
-
-        // définition des paramètres de magnification et minification des
-        // texture
-        // on indique GL_NEAREST pour dire que l'on doit prendre le pixel qui se
-        // rapporche le plus
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-
-        // paramétrage du dépassement des coordonées de texture
-        // GL_CLAMP_TO_EDGE = on étire la texture pour recouvrir la forme
-        // on peu aussi mettre un paramètre pour répéter la texture ou bien
-        // effectuer un mirroir
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
 
 
     }

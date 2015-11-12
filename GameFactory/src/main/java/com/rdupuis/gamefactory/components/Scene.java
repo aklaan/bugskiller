@@ -19,7 +19,8 @@ import javax.microedition.khronos.opengles.GL10;
 public class Scene implements GLSurfaceView.Renderer {
     public enum VIEW_MODE {ORTHO, CAMERA}
 
-
+    public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
+    public static final int SHORT_SIZE = 2;
     public final static String TAG_ERROR = "CRITICAL ERROR";
 
     public int[] vbo;
@@ -111,7 +112,7 @@ public class Scene implements GLSurfaceView.Renderer {
         // opengl. donc le provider est à recréer à chaque load de la scène
 
         initProgramShader();
-        this.getTextureProvider().initGlTextureParam();
+        this.getTextureProvider().initialize();
 
         //on défini la couleur de base pour initialiser le BUFFER
         // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -426,7 +427,7 @@ public class Scene implements GLSurfaceView.Renderer {
         //on se place sur le premier buffer référencé dans le tableau
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.vbo[indexBuffer]);
         //on charge les données
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getFbVertices().capacity(), gameObject.getFbVertices(), GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getFbVertices().capacity() *  FLOAT_SIZE, gameObject.getFbVertices(), GLES20.GL_STATIC_DRAW);
 
         //unbind
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
@@ -439,8 +440,15 @@ public class Scene implements GLSurfaceView.Renderer {
         //on se place sur le premier buffer référencé dans le tableau
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.vboi[indexBuffer]);
         //on charge les données
-        //target - size - data - usage
-        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, gameObject.getIndices().capacity(), gameObject.getIndices(), GLES20.GL_STATIC_DRAW);
+        //-------------------------------------------------------------------------------------------------
+        //      target = un buffer ELEMENT_ARRAY dans mémoire graphique
+        //      size = la taille du buffer = le nombre d'indices à stocker * la taille d'un SHORT
+        //      data = les données
+        //      usage :   GL_STATIC_DRAW  : les données sont lues une fois et sont réutilisée a chaque frame
+        //             ou GL_DYNAMIC_DRAW : les données sont lues a chaque frame
+        //-------------------------------------------------------------------------------------------------
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, gameObject.getIndices().capacity() *  SHORT_SIZE,
+                gameObject.getIndices(), GLES20.GL_STATIC_DRAW);
 
         //unbind
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);

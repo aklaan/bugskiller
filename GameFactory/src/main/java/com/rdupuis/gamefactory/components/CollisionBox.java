@@ -142,7 +142,7 @@ public class CollisionBox extends Rectangle2D {
         //sh.setVerticesCoord(this.getFbVertices());
         this.mFbVertices.clear();
         for (int i = 0; i < this.mWorldVertices.size(); i++) {
-            this.putVertex(i, this.mWorldVertices.get(i));
+            this.putXYZIntoFbVertices(i, this.mWorldVertices.get(i));
         }
         sh.setVerticesCoord(this.mFbVertices);
 
