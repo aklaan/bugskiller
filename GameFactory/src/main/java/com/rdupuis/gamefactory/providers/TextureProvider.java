@@ -18,31 +18,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.util.Log;
 
 public class TextureProvider {
 
     private Activity mActivity;
-
-    public ArrayList<Texture> getTextureList() {
-        return textureList;
-    }
-
-    public void setTextureList(ArrayList<Texture> textureList) {
-        this.textureList = textureList;
-    }
-
     private ArrayList<Texture> textureList;
-
-    //set activity
-    public void setActivity(Activity activity) {
-        this.mActivity = activity;
-    }
-
-    //get activity
-    public Activity getActivity() {
-        return this.mActivity;
-    }
 
     /**
      * Constructeur
@@ -55,10 +37,39 @@ public class TextureProvider {
     }
 
 
+    public ArrayList<Texture> getTextureList() {
+        return textureList;
+    }
+
+    public void setTextureList(ArrayList<Texture> textureList) {
+        this.textureList = textureList;
+    }
+
+    //set activity
+    public void setActivity(Activity activity) {
+        this.mActivity = activity;
+    }
+
+    //get activity
+    public Activity getActivity() {
+        return this.mActivity;
+    }
+
     public void initialize() {
         this.initGlTextureParam();
         this.initGlBuffer();
     }
+
+
+    /**
+     *
+     */
+    public void initGlTextureParam() {
+
+        // on active le texturing 2D
+        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+    }
+
 
     /**
      * add : Ajouter une nouvelle texture
@@ -82,39 +93,13 @@ public class TextureProvider {
         texture.setHeight(bitmap.getHeight());
         texture.setRessourceId(bitmapRessourceID);
 
-        // on défini un buffer contenant tous les points de l'image
-        // il en a (longeur x hauteur)
-        // pour chaque point on a 4 bytes . 3 pour la couleur RVB et 1 pour
-        // l'alpha
-        ByteBuffer wrkTextureBuffer;
-        wrkTextureBuffer = ByteBuffer.allocateDirect(bitmap.getHeight()
-                * bitmap.getWidth() * 4);
-
-        // on indique que les bytes dans le buffer doivent
-        // être enregistré selon le sens de lecture natif de l'architecture CPU
-        // (de gaucha a droite ou vice et versa)
-        wrkTextureBuffer.order(ByteOrder.nativeOrder());
-
-        byte buffer[] = new byte[4];
-        // pour chaque pixel composant l'image, on mémorise sa couleur et
-        // l'alpha
-        // dans le buffer
-        for (int i = 0; i < bitmap.getHeight(); i++) {
-            for (int j = 0; j < bitmap.getWidth(); j++) {
-                int color = bitmap.getPixel(j, i);
-                buffer[0] = (byte) Color.red(color);
-                buffer[1] = (byte) Color.green(color);
-                buffer[2] = (byte) Color.blue(color);
-                buffer[3] = (byte) Color.alpha(color);
-                wrkTextureBuffer.put(buffer);
-            }
-        }
-        // on se place a la position 0 du buffer - près à être lu plus tard
-        wrkTextureBuffer.position(0);
-        texture.setBufferTexture(wrkTextureBuffer);
         this.getTextureList().add(texture);
 
     }
+
+
+
+
 
     /**
      * @param ressourceId
@@ -157,36 +142,8 @@ public class TextureProvider {
                 e.printStackTrace();
             }
 
-            // on défini un buffer contenant tous les points de l'image
-            // il en a (longeur x hauteur)
-            // pour chaque point on a 4 bytes . 3 pour la couleur RVB et 1 pour
-            // l'alpha
-            ByteBuffer wrkTextureBuffer;
-            wrkTextureBuffer = ByteBuffer.allocateDirect(bitmap.getHeight()
-                    * bitmap.getWidth() * 4);
 
-            // on indique que les bytes dans le buffer doivent
-            // être enregistrés selon le sens de lecture natif de l'architecture CPU
-            // (de gauche a droite ou vice et versa)
-            wrkTextureBuffer.order(ByteOrder.nativeOrder());
-
-            byte buffer[] = new byte[4];
-            // pour chaque pixel composant l'image, on récupère sa couleur et
-            // l'alpha et on l'écrit dans le buffer
-            for (int i = 0; i < bitmap.getHeight(); i++) {
-                for (int j = 0; j < bitmap.getWidth(); j++) {
-                    int color = bitmap.getPixel(j, i);
-                    buffer[0] = (byte) Color.red(color);
-                    buffer[1] = (byte) Color.green(color);
-                    buffer[2] = (byte) Color.blue(color);
-                    buffer[3] = (byte) Color.alpha(color);
-                    wrkTextureBuffer.put(buffer);
-                }
-            }
-            // on se place au debut du buffer
-            wrkTextureBuffer.rewind();
-
-            //on se positionne sur le buffer texture
+             //on se positionne sur le buffer texture
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture.getGlBufferId());
 
             //--------------------------------------------------------------
@@ -214,27 +171,13 @@ public class TextureProvider {
 
             //------------------------------------------------------------
 
-
-            //on ecrit dans le buffer
-            GLES20.glTexImage2D(GL10.GL_TEXTURE_2D, texture.getGlBufferId(), GL10.GL_RGBA,
-                    texture.getWidth(), texture.getHeight(), 0, GL10.GL_RGBA,
-                    GL10.GL_UNSIGNED_BYTE, wrkTextureBuffer);
-
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
+            bitmap.recycle();
             indx++;
         }
 
     }
 
-    public void initGlTextureParam() {
-
-        // on active le texturing 2D
-        GLES20.glEnable(GLES20.GL_TEXTURE_2D);
-        //on active l'unité de traitement des textures 0
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-
-
-
-    }
 
     // charger la texture mémorisé dans le buffer dans le moteur de rendu comme
     // étant la texture 0,1,2,...

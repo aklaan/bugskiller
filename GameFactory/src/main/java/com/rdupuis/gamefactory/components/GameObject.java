@@ -159,11 +159,17 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
+    /**
+     *
+     */
     public void enableColision() {
         this.mCollisionBox = new CollisionBox(this);
         this.canCollide = true;
     }
 
+    /**
+     *
+     */
     public void disableColision() {
         this.mCollisionBox = null;
         this.canCollide = false;
@@ -206,7 +212,12 @@ public class GameObject implements Drawable, Cloneable {
         mTextCoord.rewind();
     }
 
-
+    /**
+     *
+     * @param x
+     * @param y
+     * @param anglRAD
+     */
     public void rotate(float x, float y, float anglRAD) {
 
         X = X + (float) (Math.cos(anglRAD));
@@ -230,11 +241,18 @@ public class GameObject implements Drawable, Cloneable {
         mIndices.position(0);
     }
 
+    /**
+     *
+     * @return
+     */
     public Scene getScene() {
         return this.mScene;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public FloatBuffer getFbVertices() {
 
         for (int i = 0; i < this.mVertices.size(); i++) {
@@ -328,10 +346,16 @@ public class GameObject implements Drawable, Cloneable {
 
         getFbTextCood();
         if (this.textureEnabled) {
+
+            //on active l'unité de traitement des textures 0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+
             // on demande à opengl d'utiliser la texture
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
+
+            GLES20.glUniform1i(sh.uniform_texture_location,0);
             sh.setTextureCoord(getTextCoord());
-            //GLES20.glEnableVertexAttribArray(sh.attrib_texture_coord_location);
+
 
         }
 

@@ -34,13 +34,14 @@ public class ProgramShader_simple extends ProgramShader {
                 // pour les fragment shader, il n'existe pas de de précision par défaut
                 // il est donc necessaire de la précisier soit pour tous (comme
                 // ici) ou pour chaque variable.
-                + " precision highp float; \n" + " #endif \n"
+                + " precision highp float; \n"
+                + " #endif \n"
                 + " uniform sampler2D " + this.FSH_UNIFORM_TEXTURE + ";"
                 + " uniform float " + this.FSH_UNIFORM_ALPHA + ";"
                 + " varying vec2 vTexCoord; " + " varying vec4 vColor;"
                 + " varying vec3 pos;" + " void main() {"
                 // + "    gl_FragColor =  vColor;"
-                + "gl_FragColor = texture2D(tex0, vTexCoord) * " + this.FSH_UNIFORM_ALPHA + "; "
+                + "gl_FragColor = texture2D("+FSH_UNIFORM_TEXTURE+", vTexCoord) * " + this.FSH_UNIFORM_ALPHA + "; "
                 // +
                 // "    gl_FragColor =  vec4(sin(pos.x), sin(pos.y), 0.0, 1.0);"
                 + " " + "}";
