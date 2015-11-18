@@ -24,6 +24,8 @@ public class Scene implements GLSurfaceView.Renderer {
     public final static String TAG_ERROR = "CRITICAL ERROR";
 
     public int[] vbo;
+    public int[] strideBuffer;
+
     public int[] vboi;
 
 
@@ -155,6 +157,12 @@ public class Scene implements GLSurfaceView.Renderer {
         GLES20.glGenBuffers(1, vboi, 0);
 
 
+        //on crée un tableau qui va référencer les buffer vbo
+        strideBuffer = new int[1];
+        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
+        GLES20.glGenBuffers(1, strideBuffer, 0);
+
+
         /**
          *
          */
@@ -268,7 +276,7 @@ public class Scene implements GLSurfaceView.Renderer {
             //Dessiner
             if (gameObject.isVisible) {
 //                Log.e("draw", gameObject.getTagName());
-                gameObject.draw();
+                gameObject.drawWithStride();
             }
         }
 
@@ -418,7 +426,7 @@ public class Scene implements GLSurfaceView.Renderer {
     }
 
     /**
-     * pour leq test indexbuffer est toujours à zéro vu que c'est un tableau de 1
+     * pour le test indexbuffer est toujours à zéro vu que c'est un tableau de 1
      *
      * @param gameObject
      * @param indexBuffer
@@ -435,6 +443,33 @@ public class Scene implements GLSurfaceView.Renderer {
         //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
 
     }
+
+    /**
+     * on fabrique un buffer contenant les coordonées de vertex et les coordonées de texture
+     * {x,y,z,u,v,x,y,z,u,v.......}
+     * Cette technique ne doit pas être utlisé si on fait évoluer les coordonées de texture
+     * d'un Gameobject. l'intérêt de passer par un strideBuffer c'est de placer les infos dans
+     * la mémoire graphique et de ne plus y toucher pour faire l'économie d'écriture entre la mémoire
+     * client et la mémoire graphique
+     * si on est obligé de mettre à jour la mémoire graphique à chaques frame, ça ne vaut pas le coup
+     * @param gameObject
+     * @param indexBuffer
+     */
+    public void loadStrideBuffer(GameObject gameObject, int indexBuffer) {
+        //on se place sur le premier buffer référencé dans le tableau
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.strideBuffer[indexBuffer]);
+        //on charge les données
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getStrideBuffer().capacity() *  FLOAT_SIZE,
+                gameObject.getStrideBuffer(), GLES20.GL_STATIC_DRAW);
+
+        //unbind
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
+
+    }
+
+
 
     public void loadVBOi(GameObject gameObject, int indexBuffer) {
         //on se place sur le premier buffer référencé dans le tableau

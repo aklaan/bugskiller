@@ -122,5 +122,6 @@ public class Scene01 extends Scene {
         GameObject go = this.getGameObjectByTag(this.TAG_BUG);
         this.loadVBO(go, 0);
         this.loadVBOi(go, 0);
+        this.loadStrideBuffer(go,0);
     }
 }

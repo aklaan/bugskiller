@@ -15,7 +15,6 @@ public class Vertex implements Cloneable{
 	//par sécurité, on le recalcule plutot que d'utiliser 4 par défaut.
 	public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
 
-
 	//pour les coordonnées on a 3 float X,Y,Z
     public final static int Vertex_COORD_SIZE = 3;
 	//la taille mémoire necessaire pour stocker les coordonées du vertex

@@ -106,8 +106,11 @@ public class CollisionBox extends Rectangle2D {
 
     }
 
-    @Override
-    public void draw() {
+    /**
+     *
+     * @param Mvp
+     */
+    public void draw(float[] Mvp) {
 
         ProgramShader sh = this.getScene().mProgramShaderProvider
                 .getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
@@ -146,20 +149,10 @@ public class CollisionBox extends Rectangle2D {
         }
         sh.setVerticesCoord(this.mFbVertices);
 
-
-//        float[] reverseVMatrix = new float[16];
-        //       Matrix.invertM(reverseVMatrix, 0, this.mModelView, 0);
-
-        float[] mMvp = new float[16];
-
-        Matrix.multiplyMM(mMvp, 0, this.getScene().mProjectionORTH, 0,
-                this.parent.mModelView, 0);
-
-
         // on alimente la donnée UNIFORM mAdressOf_Mvp du programme OpenGL
         // avec
         // une matrice de 4 flotant.
-        GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, this.parent.mMvp, 0);
+        GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, Mvp, 0);
 
         // on se positionne au debut du Buffer des indices
         // qui indiquent dans quel ordre les vertex doivent être dessinés

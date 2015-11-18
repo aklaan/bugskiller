@@ -13,6 +13,7 @@ import com.rdupuis.gamefactory.components.Texture;
 import com.rdupuis.gamefactory.components.Trajectory;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.utils.Tools;
 
 public class Bug extends Rectangle2D {
 
@@ -72,29 +73,19 @@ public class Bug extends Rectangle2D {
             float limit_y_min =  (this.getHeight() / 2);
             float limit_y_max = this.getScene().getHeight() - (this.getHeight() / 2);
 
-
             if (this.getCoordX() <limit_x_min || (this.getCoordX() > limit_x_max)) {
-                this.speedX = -this.speedX;
+                this.speedX = -this.speedX * Tools.getRamdom();
 
             }
             if (this.getCoordY() <limit_y_min || (this.getCoordY() > limit_y_max)) {
-                this.speedY = -this.speedY;
+                this.speedY = -this.speedY * Tools.getRamdom();
             }
 
 
             if (this.isCollideWith(this.getScene().getUserFinger())) {
                 this.setTexture(this.texture_dead);
                 this.bugLifeState = LifeState.DEAD;
-
                 this.getScene().getAnimationManager().addAnimation(new AnimationFadeOut(this));
-
-                //this.setAnimation(animFadeOut);
-                //this.getAnimation().start();
-                //MediaPlayer mPlayer = null;
-                //mPlayer = MediaPlayer.create(this.getScene().getActivity(), R.raw.scratch);
-                //mPlayer.start();
-
-
             }
 
         }
@@ -104,23 +95,12 @@ public class Bug extends Rectangle2D {
             this.setAlpha(1);
             this.setTexture(this.texture_alive);
             this.bugLifeState = LifeState.ALIVE;
-            //this.setAnimation(null);
         }
     }
 
     public Boolean isAlive() {
         return (this.bugLifeState == LifeState.ALIVE);
-
     }
 
-    public Boolean isOutsideScreen() {
-
-        Boolean cond1 = (this.getCoordX() > this.getScene().getWidth() / 2);
-        Boolean cond2 = (this.getCoordX() < -this.getScene().getWidth() / 2);
-        Boolean cond3 = (this.getCoordY() > this.getScene().getHeight() / 2);
-        Boolean cond4 = (this.getCoordY() < -this.getScene().getHeight() / 2);
-        return (cond1 || cond2 || cond3 || cond4);
-
-    }
 
 }

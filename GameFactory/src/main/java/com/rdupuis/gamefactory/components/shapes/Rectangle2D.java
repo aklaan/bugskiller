@@ -9,7 +9,7 @@ public class Rectangle2D extends Shape {
 
 	static final int NB_RECTANGLE_VERTEX = 4;
 	private float width = 1;
-	private float hight = 1;
+	private float height = 1;
 	private boolean firstFrame = true;
 	float startTime;
 
@@ -106,7 +106,7 @@ public class Rectangle2D extends Shape {
 	}
 
 	public void setHeight(float h) {
-		this.hight = h;
+		this.height = h;
 		updateVertices();
 		if (this.canCollide) {
 			this.mCollisionBox.update();
@@ -114,7 +114,7 @@ public class Rectangle2D extends Shape {
 	}
 
 	public float getHeight() {
-		return this.hight;
+		return this.height;
 	}
 
 	public float getWidth() {
@@ -133,7 +133,7 @@ public class Rectangle2D extends Shape {
 
 		// comme le 0,0 est au milieu on divise par 2
 		float w = (float) width / 2;
-		float h = (float) hight / 2;
+		float h = (float) height / 2;
 
 		this.mVertices.get(0).x = -w;
 		this.mVertices.get(0).y = h;

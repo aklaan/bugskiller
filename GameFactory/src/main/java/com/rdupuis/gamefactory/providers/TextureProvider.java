@@ -21,6 +21,9 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
 
+/**
+ * TextureProvider : class servant à gérer les textures
+ */
 public class TextureProvider {
 
     private Activity mActivity;
@@ -35,7 +38,6 @@ public class TextureProvider {
         this.setTextureList(new ArrayList<Texture>());
         this.setActivity(activity);
     }
-
 
     public ArrayList<Texture> getTextureList() {
         return textureList;
@@ -60,9 +62,8 @@ public class TextureProvider {
         this.initGlBuffer();
     }
 
-
     /**
-     *
+     * intialisation générales à ne faire d'une fois au démarrage
      */
     public void initGlTextureParam() {
 
@@ -102,6 +103,7 @@ public class TextureProvider {
 
 
     /**
+     * Recherche d'une texture via son ID dans la liste des textures
      * @param ressourceId
      * @return
      */
@@ -110,20 +112,30 @@ public class TextureProvider {
         for (Texture texture : this.getTextureList()) {
             if (texture.getRessourceId() == ressourceId) return texture;
         }
-
-        return null;
+        //si la texture n'a pas été trouvé, on retourne null
+        throw new RuntimeException("la Texture recherché n'a pas été ajouté dans la liste du TextureProvider " + String.valueOf(ressourceId));
+      //  return null;
     }
 
-
+    /**
+     * Initialisation des buffer OpenGl
+     * -> pour chaques texture, on charge l'image dans le buffer OpenGl
+     *    et on mémorise l'index du buffer dans lequel on a enregistré la texture
+     *
+     *    cette initialisation ne doit se faire qu'une fois au moment du surfaceCreated
+     *    il faut donc que toutes les textures utilisées par la la scène soient référencées en amont
+     *    dans le provider.
+     */
     private void initGlBuffer() {
 
+        //On récupère le nombre de textures à traiter
         int nbTextures = this.getTextureList().size();
 
         //on crée autant de buffer openGl que de textures
         int[] indexBuffer = new int[nbTextures];
         GLES20.glGenTextures(nbTextures, indexBuffer, 0);
 
-        // on charge chaque texture dans un buffer Opengl et
+        // on charge chaque textures dans un buffer Opengl et
         // on associe l'Id du buffer a la Texture
         int indx = 0;
         for (Texture texture : this.getTextureList()) {
@@ -131,7 +143,7 @@ public class TextureProvider {
             //on assigne un id de buffer à la texture
             texture.setGlBufferId(indexBuffer[indx]);
 
-            //on recharge l'image
+            //on charge l'image qui va servir à la texture
             Bitmap bitmap = null;
 
             try {
@@ -142,8 +154,7 @@ public class TextureProvider {
                 e.printStackTrace();
             }
 
-
-             //on se positionne sur le buffer texture
+             //on se positionne sur le buffer texture sur lequel on souhaite écrire
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture.getGlBufferId());
 
             //--------------------------------------------------------------
@@ -168,10 +179,11 @@ public class TextureProvider {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
                     GLES20.GL_CLAMP_TO_EDGE);
 
-
             //------------------------------------------------------------
-
+            //on écrit dans le buffer
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
+
+            //on supprime l'image de la mémoire
             bitmap.recycle();
             indx++;
         }
