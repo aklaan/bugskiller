@@ -52,8 +52,25 @@ public class GameObject implements Drawable, Cloneable {
     public float Z = 0;
 
     //Taille de l'objet
-    private float width ;
-    private float height ;
+    private float width;
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    private float height;
     //boite de colission de l'objet
     public CollisionBox mCollisionBox;
 
@@ -365,10 +382,16 @@ public class GameObject implements Drawable, Cloneable {
         return mTagName;
     }
 
+    /**
+     * @param tagid
+     */
     public void setTagName(int tagid) {
         mTagName = String.valueOf(tagid);
     }
 
+    /**
+     * @param tagid
+     */
     public void setTagName(String tagid) {
         mTagName = tagid;
     }
@@ -390,17 +413,28 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
+    /**
+     * @param x
+     * @param y
+     * @param z
+     */
     public void setCoord(float x, float y, float z) {
         this.X = x;
         this.Y = y;
         this.Z = z;
     }
 
+    /**
+     * @return
+     */
     public float getCoordX() {
         return X;
 
     }
 
+    /**
+     * @return
+     */
     public float getCoordY() {
         return Y;
 
@@ -563,7 +597,6 @@ public class GameObject implements Drawable, Cloneable {
         //on alimente la donnée Alpha
         GLES20.glUniform1f(sh.uniform_alpha_location, this.getAlpha());
 
-
         //je me place sur le buffer des index
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
 
@@ -626,32 +659,32 @@ public class GameObject implements Drawable, Cloneable {
     // fabrique la nouvelle ModelView en fonction des modifications
     // apportées.
     public void updateModelView() {
-        float[] wrkModelView = new float[16];
         float[] wrkRotationMatrix = new float[16];
-        //
-        // TODO :pas bien...on doit créer une fonction dans Scene pour récupérér directement l'info
-        //
-        if (this.getScene().getViewMode() == Scene.VIEW_MODE.ORTHO) {
-            wrkModelView = this.getScene().mVMatrixORTH.clone();
+        float[] modelView = new float[16];
 
-        } else
-            wrkModelView = this.getScene().mVMatrix.clone();
+        Matrix.setIdentityM(modelView,0);
 
-        //scaling
-        float[] scale = {this.width,this.height,1.f,1.f};
-
-        Matrix.multiplyMV(this.mModelView, 0, wrkModelView, 0,
-                scale, 0);
+        /**
+         * translation*rotation*scale
+         */
 
         //déplacement vers les coordonnées x,y,z
-        Matrix.translateM(wrkModelView, 0, this.X, this.Y, this.Z);
+        Matrix.translateM(modelView, 0, this.X, this.Y, this.Z);
 
-        //rotation
+        //on fabrique une matrice de rotation
         Matrix.setRotateEulerM(wrkRotationMatrix, 0, this.angleRADX,
                 this.angleRADY, this.angleRADZ);
+
         //Calcul de la matrice ModelView
-        Matrix.multiplyMM(this.mModelView, 0, wrkModelView, 0,
+        Matrix.multiplyMM(this.mModelView, 0,modelView , 0,
                 wrkRotationMatrix, 0);
+
+        //Scales matrix m in place by sx, sy, and sz.
+        //on divide par 2 car le centre de l'objet est au milieu
+        //concrètement pour le coté haut du rectangle , on a un vertex à -1,1 et l'autre à 1,1
+        //si on scale en x30 on va avoir des vertex -30,30 et 30,30 , soit une ditance de 60 entre les
+        // 2 vertex
+        Matrix.scaleM(this.mModelView, 0, this.getWidth()/2, this.getHeight()/2, 0.f);
 
     }
 

@@ -212,6 +212,7 @@ public class Scene implements GLSurfaceView.Renderer {
         // * pour un affichage Orthogonal *********************
         // le (0,0) est en bas � gauche.
         Matrix.orthoM(mProjectionORTH, 0, -0, width, 0, hight, -10.f, 10.f);
+
         Matrix.setIdentityM(mVMatrixORTH, 0);
 
     }

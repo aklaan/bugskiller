@@ -8,8 +8,8 @@ import com.rdupuis.gamefactory.enums.DrawingMode;
 public class Rectangle2D extends Shape {
 
 	static final int NB_RECTANGLE_VERTEX = 4;
-	private float width = 1;
-	private float height = 1;
+	//private float width = 1;
+	//private float height = 1;
 	private boolean firstFrame = true;
 	float startTime;
 
@@ -104,10 +104,10 @@ public class Rectangle2D extends Shape {
 			
 		}
 	}
-
+/*
 	public void setHeight(float h) {
 		this.height = h;
-		updateVertices();
+		//updateVertices();
 		if (this.canCollide) {
 			this.mCollisionBox.update();
 		}
@@ -123,15 +123,17 @@ public class Rectangle2D extends Shape {
 
 	public void setWidth(float w) {
 		this.width = w;
-		updateVertices();
+		//updateVertices();
 		if (this.canCollide) {
 			this.mCollisionBox.update();
 		}
 	}
-
+*/
 	private void updateVertices() {
 
 		// comme le 0,0 est au milieu on divise par 2
+
+		/*
 		float w = (float) width / 2;
 		float h = (float) height / 2;
 
@@ -146,7 +148,7 @@ public class Rectangle2D extends Shape {
 
 		this.mVertices.get(3).x = w;
 		this.mVertices.get(3).y = h;
-
+*/
 	}
 
 
