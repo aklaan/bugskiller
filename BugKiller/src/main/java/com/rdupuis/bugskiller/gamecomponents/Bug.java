@@ -26,12 +26,13 @@ public class Bug extends Rectangle2D {
     public Texture texture_alive;
     public Texture texture_dead;
     LifeState bugLifeState;
-    Animation animFadeOut;
     Animation animFadeOutMoveUP;
     float changeTrajectoryDelai;
     float lastTrajectoryChange;
     float speedX;
     float speedY;
+    float stepX = 10;
+    float stepY = 10;
 
     public Bug(Texture texAlive, Texture texDead) {
         super(DrawingMode.FILL);
@@ -43,8 +44,9 @@ public class Bug extends Rectangle2D {
         // et se déplace de 2 pixels
         changeTrajectoryDelai = 3000;
         lastTrajectoryChange = 0;
-        this.speedX = 10;
-        this.speedY = 10;
+        this.speedX = 1;
+        this.speedY = 1;
+
         //texture
         this.texture_alive = texAlive;
         this.texture_dead = texDead;
@@ -66,21 +68,21 @@ public class Bug extends Rectangle2D {
 
         if (this.isAlive()) {
 
-            this.setCoord(this.getCoordX() + ((float)Math.random()*this.speedX), this.getCoordY() + ((float)Math.random()*this.speedY));
+            this.setCoord(this.getCoordX() + this.speedX*stepX, this.getCoordY() + this.speedY*stepY);
 
-            float limit_x_min =  (this.getWidth() / 2);
+            float limit_x_min = (this.getWidth() / 2);
             float limit_x_max = this.getScene().getWidth() - (this.getWidth() / 2);
-            float limit_y_min =  (this.getHeight() / 2);
+            float limit_y_min = (this.getHeight() / 2);
             float limit_y_max = this.getScene().getHeight() - (this.getHeight() / 2);
 
-            if (this.getCoordX() <limit_x_min || (this.getCoordX() > limit_x_max)) {
-                this.speedX = -this.speedX ;
+
+            if (this.getCoordX() < limit_x_min || (this.getCoordX() > limit_x_max)) {
+                this.speedX = -this.speedX;
 
             }
-            if (this.getCoordY() <limit_y_min || (this.getCoordY() > limit_y_max)) {
-                this.speedY = -this.speedY ;
-            }
-
+            if (this.getCoordY() < limit_y_min || (this.getCoordY() > limit_y_max)) {
+                this.speedY = -this.speedY;
+                            }
 
             if (this.isCollideWith(this.getScene().getUserFinger())) {
                 this.setTexture(this.texture_dead);

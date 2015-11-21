@@ -38,10 +38,12 @@ public class ProgramShader_simple extends ProgramShader {
                 + " #endif \n"
                 + " uniform sampler2D " + this.FSH_UNIFORM_TEXTURE + ";"
                 + " uniform float " + this.FSH_UNIFORM_ALPHA + ";"
-                + " varying vec2 vTexCoord; " + " varying vec4 vColor;"
-                + " varying vec3 pos;" + " void main() {"
-                // + "    gl_FragColor =  vColor;"
-                + "gl_FragColor = texture2D("+FSH_UNIFORM_TEXTURE+", vTexCoord) * " + this.FSH_UNIFORM_ALPHA + "; "
+                + " varying vec2 vTextureCoord; "
+                + " varying vec4 vVertexColor;"
+                + " void main() {"
+
+                 + "    gl_FragColor =  vVertexColor;"
+              //  + "gl_FragColor = texture2D(" + FSH_UNIFORM_TEXTURE + ", vTextureCoord) * " + this.FSH_UNIFORM_ALPHA + "* vVertexColor; "
                 // +
                 // "    gl_FragColor =  vec4(sin(pos.x), sin(pos.y), 0.0, 1.0);"
                 + " " + "}";
@@ -69,21 +71,21 @@ public class ProgramShader_simple extends ProgramShader {
                         + "attribute vec3 " + this.VSH_ATTRIB_VERTEX_COORD + ";"
                         + "attribute vec2 " + this.VSH_ATTRIB_TEXTURE_COORD + ";"
                         + "attribute vec4 " + this.VSH_ATTRIB_COLOR + ";"
-                        + "varying vec4 vColor;"
-                        + "varying vec2 vTexCoord;"
-                        + "varying vec3 pos;"
+                        + "varying vec4 vVertexColor;"
+                        + "varying vec2 vTextureCoord;"
 
                         + "void main() {"
-                        // on calcule la position du point via la matrice de projection
-                        + " pos = " + this.VSH_ATTRIB_VERTEX_COORD + ";"
+                        // on calcule la position du point dans l'éspace "écran" via la matrice de projection
 
-                        + " vec4 position = " + this.VSH_UNIFORM_MVP + " * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
-                        // + " vec4 position = vec4(aPosition.xyz, 1.);"
-                        + " vColor = aColor;"
-                        + " vTexCoord = aTexCoord;"
+                        + " vVertexColor = " + this.VSH_ATTRIB_COLOR + ";"
+                        + " vTextureCoord =  " + this.VSH_ATTRIB_TEXTURE_COORD + ";"
+
+                        //le gl_pointSize n'est tutile que si GL_xxxxxx est activé
                         + "gl_PointSize = 10.;"
+
                         // cette commande doit toujours être la dernière du vertex shader.
-                        + "	gl_Position =  position;" + "}";
+                        + "	gl_Position = " + this.VSH_UNIFORM_MVP + " * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
+                        + "}";
 
     }
 
@@ -119,7 +121,7 @@ public class ProgramShader_simple extends ProgramShader {
     // sinon c'est ecran noir !
     public void enableShaderVar() {
         GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
-        //GLES20.glEnableVertexAttribArray(this.attrib_color_location);
+        GLES20.glEnableVertexAttribArray(this.attrib_color_location);
         GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
 
         // /les uniforms ne sont pas attrib !!

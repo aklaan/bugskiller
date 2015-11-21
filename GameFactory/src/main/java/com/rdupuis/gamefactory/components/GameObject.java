@@ -20,6 +20,13 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class GameObject implements Drawable, Cloneable {
 
+    private float colorR;
+    private float colorV;
+    private float colorB;
+
+    private boolean P1 = true;
+
+    private boolean P2, P3, P4, P5, P6 = false;
     //Tag de l'objet
     private String mTagName;
 
@@ -468,28 +475,65 @@ public class GameObject implements Drawable, Cloneable {
         }
 
         //--------------------------------------------
+
+        /**
+         *    mTextCoord = ByteBuffer.allocateDirect(nbVertex * 2 * FLOAT_SIZE)
+         .order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+         */
+        FloatBuffer toto = ByteBuffer.allocateDirect(mVertices.size() * 4 * FLOAT_SIZE)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        toto.rewind();
+
+        float[] aa = {0.f, 1.f, 1.f, 1.f};
+
+        for (int i = 0; i < mVertices.size(); i++) {
+            toto.rewind();
+            //on avance dans le buffer à l'endroit où on souhaite écrire
+            toto.position(4 * i);
+            //on écrit les coordonées de texture
+            toto.put(1f).put(1f).put(1f).put(1f);
+            // on se repositionne en 0 , prêt pour la lecture
+            toto.rewind();
+        }
+
+        //toto.put(aa);
+
+        toto.rewind();
+
+        //4 float dont la taille est 4*taille d'un float
+        GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
+                GLES20.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), toto);
+
+/**
+ *         GLES20.glVertexAttribPointer(this.attrib_vertex_coord_location, 3,
+ GLES20.GL_FLOAT, false, Vertex.Vertex_COORD_SIZE_BYTES, fb);
+ Vertex_COORD_SIZE_BYTES = Vertex_COORD_SIZE*FLOAT_SIZE
+ Vertex_COORD_SIZE = 3;
+ */
+        //--------------------------------------------
         sh.enableShaderVar();
 
 
         //Calcul de la matrice model-view-projection
+        //------------------------------------------------------------------------
         float[] mMvp = new float[16];
 
-
         if (this.getScene().getViewMode() == Scene.VIEW_MODE.ORTHO) {
-            Matrix.multiplyMM(mMvp, 0, this.getScene().mProjectionORTH, 0,
-                    this.mModelView, 0);
+            Matrix.multiplyMM(mMvp, 0, this.getScene().mProjectionORTH, 0, this.mModelView, 0);
 
         } else
-            Matrix.multiplyMM(mMvp, 0, this.getScene().getProjectionView(), 0,
-                    this.mModelView, 0);
+            Matrix.multiplyMM(mMvp, 0, this.getScene().getProjectionView(), 0, this.mModelView, 0);
 
         // On alimente la donnée UNIFORM mAdressOf_Mvp du programme OpenGL
         // avec une matrice de 4 flotant.
         GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, mMvp, 0);
 
-        //on alimente la donnée Alpha
+        //on alimente la donnée UNIFORM Alpha
         GLES20.glUniform1f(sh.uniform_alpha_location, this.getAlpha());
 
+        //utilisation des coordonnées stockées
+        //------------------------------------------------------------------------
         //je me place sur le vbo
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().vbo[0]);
 
@@ -503,7 +547,8 @@ public class GameObject implements Drawable, Cloneable {
         GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, 3,
                 GLES20.GL_FLOAT, false, 0, 0);
 
-
+        //utilisation de l'index buffer stocké
+        //----------------------------------------------------------------------------
         //je me place sur le buffer des index
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
 
@@ -518,7 +563,7 @@ public class GameObject implements Drawable, Cloneable {
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-
+        sh.disableShaderVar();
         // renderer.mProgramme1.disableVertexAttribArray();
         // �quivalent du POP
         // renderer.mModelView = this.mBackupModelView;
@@ -543,6 +588,8 @@ public class GameObject implements Drawable, Cloneable {
         ProgramShader sh = this.getScene().getProgramShaderProvider().getShaderByName("simple");
         this.getScene().getProgramShaderProvider().use(sh);
 
+
+        //si la texture est active on l'utilise
         if (this.textureEnabled) {
 
             //on active l'unité de traitement des textures 0
@@ -553,6 +600,98 @@ public class GameObject implements Drawable, Cloneable {
             //on fait pointer  uniform_texture_location sur le buffer où est la texture
             GLES20.glUniform1i(sh.uniform_texture_location, 0);
         }
+
+        /********************************************************************************
+         * les données Varying du shader doivent être connues POUR CHAQUES VERTEX !!!!
+         * si on passe la couleur en varying, on doit avoit un buffer couleur
+         * qui contient les couleurs de chaques vertex !!
+         * pour rappel, on a 1 vertex Shader par vertex !!!
+         *
+         *
+         *
+         * Si tous les vertex ont la même couleur , on peu simplement utiliser un Uniform
+         * car les uniforms sont connus pour tous les vertex shader
+         */
+
+        //--------------------------------------------
+
+        FloatBuffer toto = ByteBuffer.allocateDirect(mVertices.size() * 4 * FLOAT_SIZE)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        toto.rewind();
+
+        if (P1 ||P6) {
+            colorR += 0.01F;
+        }
+        if (colorR > 1) {
+            P1 = false;
+            P2 = true;
+        }
+
+        if (P2) {
+            colorV += 0.01F;
+        }
+        if (colorV > 1) {
+            P2 = false;
+            P3 = true;
+        }
+
+        if (P3){
+            colorR-=0.01f;
+        }
+
+        if (P3 && colorR<0){
+            P3 = false;
+            P4=true;
+        }
+
+        if (P4){
+            colorB += 0.01f;
+        }
+
+        if (P4 &&colorB>1){
+            P4=false;
+            P5=true;
+        }
+
+        if (P5){
+            colorV-=0.01f;
+        }
+
+        if (P5 && colorV<0){
+            P5 = false;
+            P6 = true;
+        }
+
+            if (P6 && colorR>1){
+                colorV+=0.01f;
+            }
+
+        if (colorR>1 && colorV>1 && colorB>1){
+            P1 = true;
+            P2 = P3 = P4 = P5 =P6  = false;
+            colorR = colorV = colorB = 0f;
+        }
+
+        for (int i = 0; i < mVertices.size(); i++) {
+            toto.rewind();
+            //on avance dans le buffer à l'endroit où on souhaite écrire
+            toto.position(4 * i);
+            //on écrit les coordonées de texture
+            toto.put(colorR).put(colorV).put(colorB).put(1f);
+            // on se repositionne en 0 , prêt pour la lecture
+            toto.rewind();
+        }
+
+        //toto.put(aa);
+
+        toto.rewind();
+
+        //4 float dont la taille est 4*taille d'un float
+        GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
+                GLES20.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), toto);
+
+        //--------------------------------------------
+
 
         final int stride = (Vertex.Vertex_COORD_SIZE + Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE;
 
@@ -623,21 +762,23 @@ public class GameObject implements Drawable, Cloneable {
 
 
     /**
+     * Cette fonction permet de récupérer les coordonées de vertex à l'écran
+     * en multipliant le vertex par la matrice MVP
+     *
      * @param modelView
      * @return
      */
     public ArrayList<Vertex> applyModelView(float[] modelView) {
 
-        // on r�cup�re les vertices de l'objet
-        // et on calcule leur coordon�es dans le monde
+        // on récupère les vertices de l'objet
+        // et on calcule leur coordonées dans le monde
         float[] oldVerticesCoord = new float[4];
         float[] newVerticesCoord = new float[4];
 
-        ArrayList<Vertex> mModelViewVertices; // d�finition d'un tableau de
-        // flotants
-        mModelViewVertices = new ArrayList<Vertex>();
+        // définition d'un tableau de flotants
+        ArrayList<Vertex> mModelViewVertices = new ArrayList<Vertex>();
 
-        // je suis oblig� de passer par un vecteur 4 pour la multiplication
+        // je suis obligé de passer par un vecteur 4 pour la multiplication
 
         for (int i = 0; i < this.mVertices.size(); i++) {
             oldVerticesCoord[0] = this.mVertices.get(i).x; // x
@@ -656,19 +797,23 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
-    // fabrique la nouvelle ModelView en fonction des modifications
-    // apportées.
+    /**
+     * Mise à jour de la ModelView pour prendre en compte les
+     * modification apportées à l'ojet
+     * taille - position - rotation
+     * <p/>
+     * /!\ l'ordre où on applique les transformation et hyper important
+     * il faut toujours faire : translation*rotation*scale
+     */
+
     public void updateModelView() {
         float[] wrkRotationMatrix = new float[16];
         float[] modelView = new float[16];
 
-        Matrix.setIdentityM(modelView,0);
+        //on initialise une matrice identitaire
+        Matrix.setIdentityM(modelView, 0);
 
-        /**
-         * translation*rotation*scale
-         */
-
-        //déplacement vers les coordonnées x,y,z
+        //on fabrique une matrice de déplacement vers les coordonnées x,y,z
         Matrix.translateM(modelView, 0, this.X, this.Y, this.Z);
 
         //on fabrique une matrice de rotation
@@ -676,15 +821,11 @@ public class GameObject implements Drawable, Cloneable {
                 this.angleRADY, this.angleRADZ);
 
         //Calcul de la matrice ModelView
-        Matrix.multiplyMM(this.mModelView, 0,modelView , 0,
+        Matrix.multiplyMM(this.mModelView, 0, modelView, 0,
                 wrkRotationMatrix, 0);
 
         //Scales matrix m in place by sx, sy, and sz.
-        //on divide par 2 car le centre de l'objet est au milieu
-        //concrètement pour le coté haut du rectangle , on a un vertex à -1,1 et l'autre à 1,1
-        //si on scale en x30 on va avoir des vertex -30,30 et 30,30 , soit une ditance de 60 entre les
-        // 2 vertex
-        Matrix.scaleM(this.mModelView, 0, this.getWidth()/2, this.getHeight()/2, 0.f);
+        Matrix.scaleM(this.mModelView, 0, this.getWidth(), this.getHeight(), 0.f);
 
     }
 

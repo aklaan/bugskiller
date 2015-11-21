@@ -27,8 +27,8 @@ public class CollisionBox extends Rectangle2D {
         this.isVisible = false;
         this.drawMode = GLES20.GL_LINES;
         this.mWorldVertices = new ArrayList<Vertex>();
-        this.offsetX = .1f;
-        this.offsetY = .1f;
+        this.offsetX = .05f;
+        this.offsetY = .05f;
         this.parent = go;
 
     }

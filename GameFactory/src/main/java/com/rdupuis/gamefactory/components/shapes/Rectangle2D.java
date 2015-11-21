@@ -17,10 +17,10 @@ public class Rectangle2D extends Shape {
 		super();
 
 		// on ajoute les vertex (x,y,zu,v)
-		this.mVertices.add(new Vertex(-1f, 1f, 0f, 0f, 0f));
-		this.mVertices.add(new Vertex(-1f, -1f, 0f, 0f, 1f));
-		this.mVertices.add(new Vertex(1f, -1f, 0f, 1f, 1f));
-		this.mVertices.add(new Vertex(1f, 1f, 0, 1f, 0f));
+		this.mVertices.add(new Vertex(-0.5f, 0.5f, 0f, 0f, 0f));
+		this.mVertices.add(new Vertex(-0.5f, -0.5f, 0f, 0f, 1f));
+		this.mVertices.add(new Vertex(0.5f, -0.5f, 0f, 1f, 1f));
+		this.mVertices.add(new Vertex(0.5f, 0.5f, 0, 1f, 0f));
 
 		startTime = SystemClock.elapsedRealtime();
 		switch (drawingMode) {

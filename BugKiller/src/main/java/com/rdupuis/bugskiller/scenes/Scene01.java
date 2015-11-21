@@ -57,7 +57,8 @@ public class Scene01 extends Scene {
                     this.getTextureProvider().getTextureById(R.string.bugdead));
             bug.setWidth(30);
             bug.setHeight(30);
-            bug.setCoord((float) (this.getWidth() / 2) + i * 35, (float) (this.getHeight() / 2) + i * 35);
+            bug.setCoord((float) (this.getWidth() / 2) +  35*i,
+                    (float) (this.getHeight() / 2) +  35*i);
             bug.setTagName(TAG_BUG);
 
             //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
