@@ -19,6 +19,7 @@
     <string name="mountains">images/mountains1.jpg</string>
     <string name="circle">images/circle.png</string>
 
+    <string name="spaceship">images/spaceship.png</string>
     <string name="bugalive">images/blue.png</string>
     <string name="bugdead">images/red.png</string>
  

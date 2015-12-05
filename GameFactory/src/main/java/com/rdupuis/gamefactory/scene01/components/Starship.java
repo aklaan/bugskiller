@@ -8,6 +8,7 @@ import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Texture;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
 
 public class Starship extends Rectangle2D {
@@ -118,10 +119,10 @@ public class Starship extends Rectangle2D {
 	//@Override
 	public void xxxxxxxxxxxdraw() {
 
-		ProgramShader_simple sh = (ProgramShader_simple) this.getScene()
-				.getProgramShaderProvider().getShaderByName("simple");
+		ProgramShaderManager PSM = this.getScene().getPSManager();
+		ProgramShader_simple sh = (ProgramShader_simple) PSM.getShaderByName("simple");
 
-		this.getScene().getProgramShaderProvider().use(sh);
+		PSM.use(sh);
 
 		// on charge les coordon�es de texture
 		this.getTextCoord().rewind();
@@ -162,8 +163,8 @@ public class Starship extends Rectangle2D {
 		this.getIndices().rewind();
 
 		// on charge les coordonn�es des vertices
-		this.getFbVertices().rewind();
-		sh.setVerticesCoord(this.getFbVertices());
+		//this.getFbVertices().rewind();
+		//sh.setVerticesCoord(this.getFbVertices());
 
 		// on alimente la donn�e UNIFORM mAdressOf_Mvp du programme OpenGL
 		// avec
@@ -214,14 +215,14 @@ public class Starship extends Rectangle2D {
 				for (GameObject collider : go.mCollideWithList) {
 
 					if (collider.getTagName() == String.valueOf(R.string.petit_robot)) {
-						this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.textureRobot));
+						this.setTexture(this.getScene().getTexManager().getTextureById(R.string.textureRobot));
 
 					}
 
 				}
 
 			} else {
-				this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.boulerouge));
+				this.setTexture(this.getScene().getTexManager().getTextureById(R.string.boulerouge));
 
 
 			}
@@ -232,6 +233,6 @@ public class Starship extends Rectangle2D {
 
 	public void onAnimationPlay() {
 
-		this.setTexture(this.getScene().getTextureProvider().getTextureById(R.string.textureRobot));
+		this.setTexture(this.getScene().getTexManager().getTextureById(R.string.textureRobot));
 	}
 }

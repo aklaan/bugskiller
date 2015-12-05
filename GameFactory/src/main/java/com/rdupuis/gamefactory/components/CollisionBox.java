@@ -2,6 +2,7 @@ package com.rdupuis.gamefactory.components;
 
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
 
@@ -60,15 +61,15 @@ public class CollisionBox extends Rectangle2D {
 
         // pour chaque vertex composant la forme, on va en déterminer les
         // limites pour fabriquer une boite de colision
-        for (int i = 0; i < this.parent.mVertices.size(); i++) {
+        for (int i = 0; i < this.parent.getVertices().size(); i++) {
 
             // lecture du X
-            xread = this.parent.mVertices.get(i).x;
+            xread = this.parent.getVertices().get(i).x;
             xmin = (xread < xmin) ? xread : xmin;
             xmax = (xread > xmax) ? xread : xmax;
 
             // lecture du Y
-            yread = this.parent.mVertices.get(i).y;
+            yread = this.parent.getVertices().get(i).y;
             ymin = (yread < ymin) ? yread : ymin;
             ymax = (yread > ymax) ? yread : ymax;
 
@@ -84,25 +85,20 @@ public class CollisionBox extends Rectangle2D {
         ymin += offsetY;
         ymax += -offsetY;
 
-        this.mVertices.clear();
         this.mWorldVertices.clear();
 
-        this.mVertices.add(new Vertex(xmin, ymax, 0));
         this.mWorldVertices.add(new Vertex(xmin, ymax, 0));
 
-        this.mVertices.add(new Vertex(xmin, ymin, 0));
         this.mWorldVertices.add(new Vertex(xmin, ymin, 0));
 
-        this.mVertices.add(new Vertex(xmax, ymin, 0));
         this.mWorldVertices.add(new Vertex(xmax, ymin, 0));
 
-        this.mVertices.add(new Vertex(xmax, ymax, 0));
         this.mWorldVertices.add(new Vertex(xmax, ymax, 0));
 
         // on redéfinit les coordonées des vertices
         // pour avoir les coordonnées transformées
 
-        this.mVertices = this.applyModelView(this.parent.mModelView);
+        mWorldVertices = this.applyModelView(this.parent.mModelView);
 
         this.setCoord(this.parent.X, this.parent.Y);
 
@@ -114,16 +110,16 @@ public class CollisionBox extends Rectangle2D {
      */
     public void draw(float[] Mvp) {
 
-        ProgramShader sh = this.getScene().mProgramShaderProvider
-                .getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
-        this.getScene().mProgramShaderProvider.use(sh);
+        ProgramShaderManager PSM = this.getScene().getPSManager();
+        ProgramShader sh = PSM.getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
+        PSM.use(sh);
 
         // on se positionne au debut du Buffer des indices
         // qui indiquent dans quel ordre les vertex doivent étre dessinés
         this.getIndices().position(0);
 
         // on charge les coordon�es de texture
-        sh.setTextureCoord(this.getTextCoord());
+//        sh.setTextureCoord(this.getTextCoord());
 
 //		 if (sh.attrib_color_location != -1) {
         // this.getVertices().position(0);
@@ -145,12 +141,14 @@ public class CollisionBox extends Rectangle2D {
 
         // on charge les coordonnées des vertices
         //sh.setVerticesCoord(this.getFbVertices());
-        this.mFbVertices.clear();
+        //this.mFbVertices.clear();
+        /*
         for (int i = 0; i < this.mWorldVertices.size(); i++) {
+
             this.putXYZIntoFbVertices(i, this.mWorldVertices.get(i));
         }
         sh.setVerticesCoord(this.mFbVertices);
-
+*/
         // on alimente la donnée UNIFORM mAdressOf_Mvp du programme OpenGL
         // avec
         // une matrice de 4 flotant.

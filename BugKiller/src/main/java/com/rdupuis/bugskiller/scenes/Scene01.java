@@ -52,9 +52,9 @@ public class Scene01 extends Scene {
         //this.addToScene(background);
 
         //BUG
-        for (int i = 1; i < 10; i++) {
-            Bug bug = new Bug(this.getTextureProvider().getTextureById(R.string.bugalive),
-                    this.getTextureProvider().getTextureById(R.string.bugdead));
+        for (int i = 1; i < 5; i++) {
+            Bug bug = new Bug(this.getTexManager().getTextureById(R.string.spaceship),
+                    this.getTexManager().getTextureById(R.string.bugdead));
             bug.setWidth(30);
             bug.setHeight(30);
             bug.setCoord((float) (this.getWidth() / 2) +  35*i,
@@ -68,8 +68,8 @@ public class Scene01 extends Scene {
         //BUTTON
         //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(450, 150, 200, 100, this.getTextureProvider().getTextureById(R.string.circle),
-                this.getTextureProvider().getTextureById(R.string.bugdead));
+        button = new Button(450, 150, 200, 100, this.getTexManager().getTextureById(R.string.circle),
+                this.getTexManager().getTextureById(R.string.bugdead));
         button.setTagName(TAG_BUTTON);
         button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
         button.mCollisionBox.isVisible = true;
@@ -79,7 +79,7 @@ public class Scene01 extends Scene {
             @Override
             public void onClick() {
                 Log.e("debug", "click");
-                GameObject bug = Scene01.this.getGameObjectByTag(TAG_BUG);
+                GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
 
             }
@@ -87,11 +87,10 @@ public class Scene01 extends Scene {
             @Override
             public void onLongClick() {
                 Log.e("debug", "long click");
-                GameObject bug = Scene01.this.getGameObjectByTag(TAG_BUG);
+                GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationFadeOut(bug));
 
             }
-
 
         };
 
@@ -100,29 +99,22 @@ public class Scene01 extends Scene {
 
 
     @Override
-    public void initProgramShader() {
-        this.getProgramShaderProvider().catalogShader.clear();
-        this.getProgramShaderProvider().shaderList.clear();
-        this.getProgramShaderProvider().add(new ProgramShader_simple());
-        this.getProgramShaderProvider().add(new ProgramShader_forLines());
+    public void loadProgramShader() {
+        this.getPSManager().catalogShader.clear();
+        this.getPSManager().shaderList.clear();
+        this.getPSManager().add(new ProgramShader_simple());
+        this.getPSManager().add(new ProgramShader_forLines());
     }
 
     @Override
     public void loadTextures() {
 
-        this.getTextureProvider().add(R.string.bugalive);
-        this.getTextureProvider().add(R.string.bugdead);
-        this.getTextureProvider().add(R.string.circle);
+        this.getTexManager().add(R.string.bugalive);
+        this.getTexManager().add(R.string.bugdead);
+        this.getTexManager().add(R.string.circle);
+        this.getTexManager().add(R.string.spaceship);
+
     }
 
 
-    @Override
-    public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
-        super.onSurfaceCreated(gl2, eglConfig);
-
-        GameObject go = this.getGameObjectByTag(this.TAG_BUG);
-        this.loadVBO(go, 0);
-        this.loadVBOi(go, 0);
-        this.loadStrideBuffer(go,0);
-    }
 }

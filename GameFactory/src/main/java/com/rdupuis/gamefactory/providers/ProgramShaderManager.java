@@ -16,7 +16,7 @@ import android.util.Log;
  * @author NC10
  * 
  */
-public class ProgramShaderProvider {
+public class ProgramShaderManager {
 
 	// ! activity
 	public Activity mActivity;
@@ -37,7 +37,7 @@ public class ProgramShaderProvider {
 	 * 
 	 * @param activity
 	 */
-	public ProgramShaderProvider(Activity activity) {
+	public ProgramShaderManager(Activity activity) {
 		this.mActivity = activity;
 		this.mCurrentActiveShader = null;
 

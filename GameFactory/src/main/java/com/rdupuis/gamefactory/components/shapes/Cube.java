@@ -20,7 +20,9 @@ public class Cube extends Shape {
 		super();
 
 		// on ajoute les vertex (x,y,zu,v)
+		/*
 		this.mVertices.add(new Vertex(-1f, 1f, -1f, 0f, 0f));
+
 		this.mVertices.add(new Vertex(-1f, -1f, -1f, 0f, 1f));
 		this.mVertices.add(new Vertex(1f, -1f, -1f, 1f, 1f));
 		this.mVertices.add(new Vertex(1f, 1f, -1, 1f, 0f));
@@ -29,7 +31,7 @@ public class Cube extends Shape {
 		this.mVertices.add(new Vertex(-1f, -1f, 1f, 0f, 1f));
 		this.mVertices.add(new Vertex(1f, -1f, 1f, 1f, 1f));
 		this.mVertices.add(new Vertex(1f, 1f, 1, 1f, 0f));
-
+*/
 		
 		
 		
@@ -38,8 +40,8 @@ public class Cube extends Shape {
 		// on dessine que les lignes de contour
 		case EMPTY:
 			this.drawMode = GLES20.GL_LINES;
-			this.initBuffers(24);
-			this.putIndice(0, 0);
+		//	this.initBuffers(24);
+	/*		this.putIndice(0, 0);
 			this.putIndice(1, 1);
 
 			this.putIndice(2, 1);
@@ -80,23 +82,23 @@ public class Cube extends Shape {
 			this.putIndice(22, 3);
 			this.putIndice(23, 7);
 
-			
+*/
 			break;
 		// on dessine des triangles plein
 		case FILL:
 
-			this.initBuffers(6);
+		//	this.initBuffers(6);
 
 			// on indique l'ordre dans lequel on doit affichier les vertex
 			// pour dessiner les 2 triangles qui vont former le carré.
-			this.putIndice(0, 0);
+/*			this.putIndice(0, 0);
 			this.putIndice(1, 1);
 			this.putIndice(2, 2);
 
 			this.putIndice(3, 0);
 			this.putIndice(4, 2);
 			this.putIndice(5, 3);
-			break;
+*/			break;
 		}
 
 	}
@@ -155,7 +157,7 @@ public class Cube extends Shape {
 		float w = (float) width / 2;
 		float h = (float) hight / 2;
 		float d = (float) depth / 2;
-		
+		/*
 		this.mVertices.get(0).x = -w;
 		this.mVertices.get(0).y = h;
 		this.mVertices.get(0).z = -d;
@@ -188,7 +190,7 @@ public class Cube extends Shape {
 		this.mVertices.get(7).y = h;
 		this.mVertices.get(7).z = d;
 
-	
+	*/
 	
 	}
 

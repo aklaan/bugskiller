@@ -2,6 +2,7 @@ package com.rdupuis.gamefactory.utils;
 
 import java.util.ArrayList;
 
+import com.rdupuis.gamefactory.components.CollisionBox;
 import com.rdupuis.gamefactory.components.GameObject;
 
 public class SAT {
@@ -11,39 +12,38 @@ public class SAT {
 
 	// reconstituer la liste des vextex dans le bon ordre à partir du
 	// floatbuffer mvertice et shortbuffer mindice de la forme
-	public static ArrayList<Vector2D> getVerticesInOrder(GameObject mShape) {
+	public static ArrayList<Vector2D> getVerticesInOrder(CollisionBox collisionBox) {
 		ArrayList<Vector2D> result = new ArrayList<Vector2D>();
 
-		int size = mShape.mVertices.size(); // on fait moins 1 car on commence a
+		int size = collisionBox.mWorldVertices.size(); // on fait moins 1 car on commence a
 											// zéro
 
 		for (int i = 0; i < size; i++) {
 
-			result.add(new Vector2D(mShape.mVertices.get(i).x, mShape.mVertices
-					.get(i).y));
+			result.add(new Vector2D(collisionBox.mWorldVertices.get(i).x, collisionBox.mWorldVertices.get(i).y));
 
 		}
 
 		return result;
 	}
 
-	public static ArrayList<Vector2D> prepareVector(GameObject mShape) {
+	public static ArrayList<Vector2D> prepareVector(CollisionBox collisionBox) {
 		ArrayList<Vector2D> result = new ArrayList<Vector2D>();
 
-		int size = mShape.mVertices.size() - 1; // on fait moins 1 car on
+		int size = collisionBox.mWorldVertices.size() - 1; // on fait moins 1 car on
 												// commence a zéro
 
 		for (int i = 0; i < size; i++) {
 
-			result.add(new Vector2D(mShape.mVertices.get(i + 1).x
-					- mShape.mVertices.get(i).x, mShape.mVertices.get(i + 1).y
-					- mShape.mVertices.get(i).y));
+			result.add(new Vector2D(collisionBox.mWorldVertices.get(i + 1).x
+					- collisionBox.mWorldVertices.get(i).x, collisionBox.mWorldVertices.get(i + 1).y
+					- collisionBox.mWorldVertices.get(i).y));
 
 		}
 
-		result.add(new Vector2D(mShape.mVertices.get(0).x
-				- mShape.mVertices.get(size).x, mShape.mVertices.get(0).y
-				- mShape.mVertices.get(size).y));
+		result.add(new Vector2D(collisionBox.mWorldVertices.get(0).x
+				- collisionBox.mWorldVertices.get(size).x, collisionBox.mWorldVertices.get(0).y
+				- collisionBox.mWorldVertices.get(size).y));
 
 		return result;
 	}
@@ -51,10 +51,10 @@ public class SAT {
 	//Calcul des vecteurs Normal aux faces
 	//pour que le calcul SAT fonctionne, il faut que le vecteur normal soit 
 	//unitaire (magnitude de 1) sinon ça ne fonctionne pas.
-	public static ArrayList<Vector2D> getNormals(GameObject mShape) {
+	public static ArrayList<Vector2D> getNormals(CollisionBox collisionBox) {
 
 		ArrayList<Vector2D> result = new ArrayList<Vector2D>();
-		ArrayList<Vector2D> preparedVector = prepareVector(mShape);
+		ArrayList<Vector2D> preparedVector = prepareVector(collisionBox);
 
 		// le vecteur normal à(X,Y) est (-Y,X)
 
@@ -103,7 +103,7 @@ public class SAT {
 		return maxProj;
 	}
 
-	public static boolean isColide(GameObject shape1, GameObject shape2) {
+	public static boolean isColide(CollisionBox shape1, CollisionBox shape2) {
 		Boolean isSperarated = true;
 
 		ArrayList<Vector2D> shape1_SortedVertices = new ArrayList<Vector2D>();

@@ -7,8 +7,9 @@ import android.os.SystemClock;
 import android.util.DisplayMetrics;
 
 import com.rdupuis.gamefactory.animations.AnimationManager;
-import com.rdupuis.gamefactory.providers.ProgramShaderProvider;
-import com.rdupuis.gamefactory.providers.TextureProvider;
+import com.rdupuis.gamefactory.providers.GameObjectManager;
+import com.rdupuis.gamefactory.providers.ProgramShaderManager;
+import com.rdupuis.gamefactory.providers.TextureManager;
 import com.rdupuis.gamefactory.utils.CollisionControler;
 
 import java.util.ArrayList;
@@ -19,22 +20,16 @@ import javax.microedition.khronos.opengles.GL10;
 public class Scene implements GLSurfaceView.Renderer {
     public enum VIEW_MODE {ORTHO, CAMERA}
 
-    public static final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
-    public static final int SHORT_SIZE = 2;
     public final static String TAG_ERROR = "CRITICAL ERROR";
 
-    public int[] vbo;
-    public int[] strideBuffer;
-
-    public int[] vboi;
-
-
     private VIEW_MODE mViewMode;
-    public OpenGLActivity mActivity;
-    public ProgramShaderProvider mProgramShaderProvider;
-    public TextureProvider mTextureProvider;
-    private ArrayList<GameObject> mGameObjectList;
+    private OpenGLActivity mActivity;
+
+    private TextureManager mTextureManager;
     private AnimationManager animationManager;
+    private GameObjectManager mGameObjectManager;
+    private ProgramShaderManager mProgramShaderManager;
+
     public final float[] mVMatrix = new float[16];
     public final float[] mVMatrixORTH = new float[16];
 
@@ -48,79 +43,157 @@ public class Scene implements GLSurfaceView.Renderer {
     private boolean firstFrame;
     public Camera mCamera;
 
-    public Scene(OpenGLActivity activity) {
-
-        mActivity = activity;
-        //par defaut on est en mode de vue Orthogonale
-        this.mViewMode = VIEW_MODE.ORTHO;
-        // le bitmap provider peu servir pour plusieurs scene
-        // on le remonte donc au plus haut.
-        this.mTextureProvider = new TextureProvider(this.getActivity());
-        this.mGameObjectList = new ArrayList<GameObject>();
-        this.mProgramShaderProvider = new ProgramShaderProvider(mActivity);
-        this.mCamera = new Camera();
-        this.mCamera.centerZ = 100;
-        this.firstFrame = true;
-        this.animationManager = new AnimationManager();
-        this.preLoading();
-
-        UserFinger userFinger = new UserFinger();
-        this.addToScene(userFinger);
-
+    /**
+     * @return
+     */
+    public TextureManager getTexManager() {
+        return mTextureManager;
     }
 
+    /**
+     * @param mTextureManager
+     */
+    public void setTexManager(TextureManager mTextureManager) {
+        this.mTextureManager = mTextureManager;
+    }
+
+    /**
+     * @return
+     */
+    public GameObjectManager getGOManager() {
+        return mGameObjectManager;
+    }
+
+    /**
+     * @param mGameObjectManager
+     */
+    public void setGOManager(GameObjectManager mGameObjectManager) {
+        this.mGameObjectManager = mGameObjectManager;
+    }
+
+    /**
+     * @return
+     */
+    public ProgramShaderManager getPSManager() {
+        return mProgramShaderManager;
+    }
+
+    /**
+     * @param mProgramShaderManager
+     */
+    public void setPSManager(ProgramShaderManager mProgramShaderManager) {
+        this.mProgramShaderManager = mProgramShaderManager;
+    }
+
+    /**
+     * @param animationManager
+     */
+    public void setAnimationManager(AnimationManager animationManager) {
+        this.animationManager = animationManager;
+    }
+
+    /**
+     * @return
+     */
     public VIEW_MODE getViewMode() {
         return mViewMode;
     }
 
+    /**
+     * @param mViewMode
+     */
     public void setViewMode(VIEW_MODE mViewMode) {
         this.mViewMode = mViewMode;
     }
 
-
+    /**
+     * @return
+     */
     public AnimationManager getAnimationManager() {
         return this.animationManager;
     }
 
+    /**
+     * @return
+     */
     public OpenGLActivity getActivity() {
         return this.mActivity;
     }
 
-    public TextureProvider getTextureProvider() {
-        return this.mTextureProvider;
-    }
-
-    public ProgramShaderProvider getProgramShaderProvider() {
-        return this.mProgramShaderProvider;
-    }
-
+    /**
+     * @return
+     */
     public float[] getProjectionView() {
         return this.mProjectionView;
     }
 
+
+    /**
+     * Constructeur
+     *
+     * @param activity
+     */
+    public Scene(OpenGLActivity activity) {
+
+        this.mActivity = activity;
+        //par defaut on est en mode de vue Orthogonale
+        this.mViewMode = VIEW_MODE.ORTHO;
+
+        setTexManager(new TextureManager(activity));
+        setPSManager(new ProgramShaderManager(activity));
+        setAnimationManager(new AnimationManager());
+        setGOManager(new GameObjectManager(this));
+
+        this.mCamera = new Camera();
+        this.mCamera.centerZ = 100;
+        this.firstFrame = true;
+
+        this.preLoading();
+
+        UserFinger userFinger = new UserFinger();
+
+        // TODO : il faut sortir ce composant de la liste des objets pour
+        // TODO : en faire un contrôleur
+        this.addToScene(userFinger);
+
+    }
+
+
+    /**
+     * on préchage les éléménts qui ne nécéssitent pas d'avoir un contexte openGl
+     * de créé.
+     */
     private void preLoading() {
         // on charge les textures necessaires à la scène
         loadTextures();
         // on initialise la liste des objets qui serront contenus dans
         // la scène.
-
         loadGameObjects();
     }
 
+    /**
+     * @param gl2
+     * @param eglConfig
+     */
     @Override
     public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
 
         // on ne peux pas créer de programe Shader en dehors du contexte
-        // opengl. donc le provider est à recréer à chaque load de la scène
+        // opengl. donc le provider est à recréer à chaque fois que l'on contruit la scène
+        // c'est à dire : au démarrage et à chaque fois que l'on incline l'écran
 
-        initProgramShader();
-        this.getTextureProvider().initialize();
+        loadProgramShader();
 
-        //on défini la couleur de base pour initialiser le BUFFER
+        //chargement des textures dans le contexte OpenGl
+        this.getTexManager().initializeGLContext();
+
+        //chargement des objets le contexte OpenGl
+        this.getGOManager().initializeGLContext();
+
+        // on défini la couleur de base pour initialiser le BUFFER de rendu
         // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         // on va remplir le back buffer avec la couleur pré-définie ici
         GLES20.glClearColor(0.3f, 0.2f, 0.2f, 1.0f);
-
 
         // Activattion de la gestion de l'Alpha
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -131,41 +204,18 @@ public class Scene implements GLSurfaceView.Renderer {
         // montre
         GLES20.glFrontFace(GL10.GL_CCW);
 
-        // on indique quelle face à oculter (par défaut c'est BACK)
-        //       GLES20.glCullFace(GL10.GL_BACK);
 
         // Activation du Culling
-        // je l'ai désactivé ici car on ne s'en sert pas
-        // c'est ça en moins à calculer donc c'est sans doute un gain de perf.
-//        GLES20.glEnable(GL10.GL_CULL_FACE);
+        // nb : je l'ai désactivé ici car on ne s'en sert pas
+        //      c'est ça en moins à calculer donc c'est un gain de perf.
+        //  GLES20.glEnable(GL10.GL_CULL_FACE);
 
-        // pour l'affichage en mode GL_LINES
+        // on indique quelle face à oculter (par défaut c'est BACK)
+        // GLES20.glCullFace(GL10.GL_BACK);
+
+        // Taille des lignes pour l'affichage en mode GL_LINES
         GLES20.glLineWidth(1.f);
 
-        /**
-         * test sur les VBO
-         */
-
-        //on crée un tableau qui va référencer les buffer vbo
-        vbo = new int[1];
-        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
-        GLES20.glGenBuffers(1, vbo, 0);
-
-        //on crée un tableau qui va référencer les buffer vboi
-        vboi = new int[1];
-        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
-        GLES20.glGenBuffers(1, vboi, 0);
-
-
-        //on crée un tableau qui va référencer les buffer vbo
-        strideBuffer = new int[1];
-        //on demande à OpenGL de créer des buffer et de les référencer dans le tableau
-        GLES20.glGenBuffers(1, strideBuffer, 0);
-
-
-        /**
-         *
-         */
 
     }
 
@@ -217,6 +267,14 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
+    public float[] getProjection() {
+        if (this.getViewMode() == Scene.VIEW_MODE.ORTHO) {
+            return this.mProjectionORTH;
+        }
+        return this.mProjectionView;
+
+    }
+
     @Override
     public void onDrawFrame(GL10 gl) {
 
@@ -227,9 +285,9 @@ public class Scene implements GLSurfaceView.Renderer {
         //on mémorise le moment où on commence le cycle
         float startDrawingTime = SystemClock.currentThreadTimeMillis();
 
-        // on vide le buffer.
+        // on vide le buffer de rendu en remplacant tout le contenu par la couleur
+        // qui a été prédéfinie.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
 
         /***************************************************************************************
          * Calcul de la Matrice de VIEW : mVMatrix
@@ -244,12 +302,10 @@ public class Scene implements GLSurfaceView.Renderer {
         // Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
 
         /** Initialisation du pointeur de touché */
-        this.getGameObjectByTag(UserFinger.USER_FINGER_TAG).mainUpdate(mActivity);
+        this.getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG).mainUpdate();
 
         /**
-         * jouer les animations si elles éxistent
-         */
-
+         * jouer les animations si elles éxistent */
         this.animationManager.playAnimations();
 
         /** on check les colissions entre tous les éléments de la scène
@@ -260,36 +316,12 @@ public class Scene implements GLSurfaceView.Renderer {
          * pour éviter le problème, on ne chek pas les colissions sur la première Frame
          */
         if (!firstFrame) {
-            CollisionControler.checkAllCollisions(mGameObjectList);
+            CollisionControler.checkAllCollisions(getGOManager().GOList());
         }
 
-
-        /************************************************************************
-         *Pour chaques GameObject de la scène, on appelle
-         * la mise à jour et on le dessine s'il est visible.
-         */
-
-        for (GameObject gameObject : this.mGameObjectList) {
-
-            //Mises à jour
-            gameObject.mainUpdate(mActivity);
-
-            //Dessiner
-            if (gameObject.isVisible) {
-//                Log.e("draw", gameObject.getTagName());
-                gameObject.drawWithStride();
-            }
-        }
-
-/**
- if (this.animationManager.playInProgress()) {
- this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-
- } else {
- this.getActivity().mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
- }
- */
+        /**
+         * on appel le manager d'objet pour dessiner */
+        this.getGOManager().draw();
 
         /****************************************************************************
          * Pour une Animation fluide, 60 FPS sont sufisants
@@ -317,15 +349,14 @@ public class Scene implements GLSurfaceView.Renderer {
      * fonction où on charge les objets de la scène dans la phase de Loading
      * game
      */
+    //TODO : rendre des fonction obligatoire en override en passant pas une classe abstraite
     public void loadGameObjects() {
-
     }
 
     /**
      * Initialisation des program Shader
      */
-    public void initProgramShader() {
-
+    public void loadProgramShader() {
     }
 
     /**
@@ -342,7 +373,7 @@ public class Scene implements GLSurfaceView.Renderer {
      */
     public void addToScene(GameObject gameobject) {
         gameobject.setScene(this);
-        this.mGameObjectList.add(gameobject);
+        this.getGOManager().add(gameobject);
 
     }
 
@@ -353,7 +384,7 @@ public class Scene implements GLSurfaceView.Renderer {
      */
     public void removeFromScene(GameObject gameobject) {
         gameobject.setScene(null);
-        this.mGameObjectList.remove(gameobject);
+        this.getGOManager().remove(gameobject);
 
     }
 
@@ -366,26 +397,9 @@ public class Scene implements GLSurfaceView.Renderer {
         for (GameObject go : GameObjectList) {
             go.setScene(this);
         }
-        this.mGameObjectList.addAll(GameObjectList);
+        this.getGOManager().addAll(GameObjectList);
     }
 
-    /**
-     * Récupérer un GameObject de la scène via son TAG
-     *
-     * @param tagId
-     * @return
-     */
-    public GameObject getGameObjectByTag(String tagId) {
-        GameObject result = null;
-        for (GameObject gameObject : this.mGameObjectList) {
-            // Log.i("info : ", gameObject.getTagName());
-            if (gameObject.getTagName() == tagId) {
-                result = gameObject;
-            }
-
-        }
-        return result;
-    }
 
     /**
      * Récupérer l'Input UserFinger
@@ -394,7 +408,7 @@ public class Scene implements GLSurfaceView.Renderer {
      */
     public UserFinger getUserFinger() {
         GameObject result = null;
-        for (GameObject gameObject : this.mGameObjectList) {
+        for (GameObject gameObject : this.getGOManager().GOList()) {
 
             if (gameObject.getTagName() == UserFinger.USER_FINGER_TAG) {
                 result = gameObject;
@@ -426,72 +440,6 @@ public class Scene implements GLSurfaceView.Renderer {
         return metrics.widthPixels;
     }
 
-    /**
-     * pour le test indexbuffer est toujours à zéro vu que c'est un tableau de 1
-     *
-     * @param gameObject
-     * @param indexBuffer
-     */
-    public void loadVBO(GameObject gameObject, int indexBuffer) {
-        //on se place sur le premier buffer référencé dans le tableau
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.vbo[indexBuffer]);
-        //on charge les données
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getFbVertices().capacity() *  FLOAT_SIZE, gameObject.getFbVertices(), GLES20.GL_STATIC_DRAW);
-
-        //unbind
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
-        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
-
-    }
-
-    /**
-     * on fabrique un buffer contenant les coordonées de vertex et les coordonées de texture
-     * {x,y,z,u,v,x,y,z,u,v.......}
-     * Cette technique ne doit pas être utlisé si on fait évoluer les coordonées de texture
-     * d'un Gameobject. l'intérêt de passer par un strideBuffer c'est de placer les infos dans
-     * la mémoire graphique et de ne plus y toucher pour faire l'économie d'écriture entre la mémoire
-     * client et la mémoire graphique
-     * si on est obligé de mettre à jour la mémoire graphique à chaques frame, ça ne vaut pas le coup
-     * @param gameObject
-     * @param indexBuffer
-     */
-    public void loadStrideBuffer(GameObject gameObject, int indexBuffer) {
-        //on se place sur le premier buffer référencé dans le tableau
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.strideBuffer[indexBuffer]);
-        //on charge les données
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, gameObject.getStrideBuffer().capacity() *  FLOAT_SIZE,
-                gameObject.getStrideBuffer(), GLES20.GL_STATIC_DRAW);
-
-        //unbind
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
-        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
-
-    }
-
-
-
-    public void loadVBOi(GameObject gameObject, int indexBuffer) {
-        //on se place sur le premier buffer référencé dans le tableau
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.vboi[indexBuffer]);
-        //on charge les données
-        //-------------------------------------------------------------------------------------------------
-        //      target = un buffer ELEMENT_ARRAY dans mémoire graphique
-        //      size = la taille du buffer = le nombre d'indices à stocker * la taille d'un SHORT
-        //      data = les données
-        //      usage :   GL_STATIC_DRAW  : les données sont lues une fois et sont réutilisée a chaque frame
-        //             ou GL_DYNAMIC_DRAW : les données sont lues a chaque frame
-        //-------------------------------------------------------------------------------------------------
-        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, gameObject.getIndices().capacity() *  SHORT_SIZE,
-                gameObject.getIndices(), GLES20.GL_STATIC_DRAW);
-
-        //unbind
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        //A TESTER : on peut normalement effacer fbVertices du gameobject pour libérer la mémoire
-
-    }
 
     private void updateCamera() {
         /**

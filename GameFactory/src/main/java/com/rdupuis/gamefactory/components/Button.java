@@ -56,7 +56,7 @@ public class Button extends Rectangle2D implements Clikable {
       //  Log.e("button", "on update");
         if (SystemClock.elapsedRealtime() - this.lastTap != DELAY_BTWN_TAP) {
 
-            if (this.isCollideWith(this.getScene().getGameObjectByTag(UserFinger.USER_FINGER_TAG))) {
+            if (this.isCollideWith(this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG))) {
         //        Log.e("button", "set texture down");
                 this.setTexture(this.textureDown);
                 this.status = ButtonStatus.DOWN;

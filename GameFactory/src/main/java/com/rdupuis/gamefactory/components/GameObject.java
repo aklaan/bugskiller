@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import com.rdupuis.gamefactory.animations.Animation;
 import com.rdupuis.gamefactory.interfaces.Drawable;
+import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
@@ -20,13 +21,35 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class GameObject implements Drawable, Cloneable {
 
-    private float colorR;
-    private float colorV;
-    private float colorB;
 
-    private boolean P1 = true;
+    //Id du buffer Gl où se trouvent les vertex
+    private int glVBoId;
 
-    private boolean P2, P3, P4, P5, P6 = false;
+    public int getNbvertex() {
+        return nbvertex;
+    }
+
+    public void setNbvertex(int nbvertex) {
+        this.nbvertex = nbvertex;
+    }
+
+    public int getNbIndex() {
+        return nbIndex;
+    }
+
+    public void setNbIndex(int nbIndex) {
+        this.nbIndex = nbIndex;
+    }
+
+    //nombre de vertex
+    private int nbvertex;
+
+    //Id du buffer Gl où se trouvent les index vertex
+    private int glVBiId;
+
+    //nombre d'index vertex
+    private int nbIndex;
+
     //Tag de l'objet
     private String mTagName;
 
@@ -60,6 +83,26 @@ public class GameObject implements Drawable, Cloneable {
 
     //Taille de l'objet
     private float width;
+
+    /**
+     * @return
+     */
+    public int getGlVBoId() {
+        return glVBoId;
+    }
+
+    public void setGlVBoId(int glVBoId) {
+        this.glVBoId = glVBoId;
+    }
+
+    public int getGlVBiId() {
+        return glVBiId;
+    }
+
+    public void setGlVBiId(int glVBiId) {
+        this.glVBiId = glVBiId;
+    }
+
 
     public float getHeight() {
         return height;
@@ -119,23 +162,19 @@ public class GameObject implements Drawable, Cloneable {
     // soit : 00000000 00000000
 
     //liste des vertex composant l'objet
-    public ArrayList<Vertex> mVertices;
+   // public ArrayList<Vertex> mVertices;
 
-
-    // TODO: ce buffer n'est pas censé rester en mémoire client !!!
-    // définition d'un buffer conteant les coordonées des vetices
-    public FloatBuffer mStrideBuffer;
 
     // ! Vertices
     // définition d'un buffer conteant les coordonées des vertices
     // TODO: ce buffer n'est pas censé rester en mémoire client
-    public FloatBuffer mFbVertices;
+  //  public FloatBuffer mFbVertices;
 
     // ! indices
     //Définition d'un buffer contenant les indices représentant l'ordre dans lequel
     // doivent être dessinés chaque vertex
     // TODO: ce buffer n'est pas censé rester en mémoire client
-    private ShortBuffer mIndices;
+//    private ShortBuffer mIndices;
 
     // ! coordonées de texture
     // définition d'un buffer avec les coordonées de textures.
@@ -155,6 +194,7 @@ public class GameObject implements Drawable, Cloneable {
         //taille par défaut
         this.width = 1;
         this.height = 1;
+
         //pas de rendu des texture par défaut
         textureEnabled = false;
 
@@ -169,11 +209,17 @@ public class GameObject implements Drawable, Cloneable {
 
         this.mCollideWithList = new ArrayList<GameObject>();
         this.mGameObjectToListenList = new ArrayList<GameObject>();
-        this.mVertices = new ArrayList<Vertex>();
+       // this.mVertices = new ArrayList<Vertex>();
 
 
     }
 
+
+    //cette fonction est à overrider par les GameObject
+    public ArrayList<Vertex> getVertices() {
+        ArrayList<Vertex> result = new ArrayList<Vertex>();
+        return result;
+    }
 
     public Texture getTexture() {
         return mTexture;
@@ -191,51 +237,13 @@ public class GameObject implements Drawable, Cloneable {
     /**
      * @return
      */
-
-
     public ArrayList<GameObject> getGameObjectToListenList() {
         return this.mGameObjectToListenList;
     }
 
-    /**
-     * on crée les buffers dans la mémoire cliente
-     *
-     * @param nbIndex
-     */
-    public void initBuffers(int nbIndex) {
-        int nbVertex = mVertices.size();
-
-        //on alloue un espace mémoire pour stocker les coordonnées des vertex
-        //la taille de cet espace est
-        //   le nombre de vertex
-        // x 3 car on a 3 coordonnées XYZ par vertex
-        // x la taille d'un Float puisque chaque coordonnée est exprimée en float.
-        mFbVertices = ByteBuffer.allocateDirect(nbVertex * 3 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-
-        //on alloue un espace mémoire pour stocker les indices servant à dessiner les ertex
-        //la taille de cet espace est
-        // le nombre d'indices
-        // x la taille d'un short car les indices sont exprimés en short
-        mIndices = ByteBuffer.allocateDirect(nbIndex * SHORT_SIZE)
-                .order(ByteOrder.nativeOrder()).asShortBuffer();
-
-        //on alloue un espace mémoire pour stocker les coordonées de texture
-        //la taille de cet espace est
-        // le nombre de vertex
-        // x 2 car on a 2 coordonnées UV
-        // x la taille d'un float car les coordonées sont exprimés en float
-
-        mTextCoord = ByteBuffer.allocateDirect(nbVertex * 2 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-
-        //le stride buffer est le la taille du buffer des vertices + buffer des coordonnées de texture
-        mStrideBuffer = ByteBuffer.allocateDirect(nbVertex * 5 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-    }
 
     /**
-     *
+     * Activer la gestion des colisions
      */
     public void enableColision() {
         this.mCollisionBox = new CollisionBox(this);
@@ -243,7 +251,7 @@ public class GameObject implements Drawable, Cloneable {
     }
 
     /**
-     *
+     * désactiver la gestion des colisions
      */
     public void disableColision() {
         this.mCollisionBox = null;
@@ -252,32 +260,25 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
-    /**
-     * @param index
-     */
-    public void putIntoStrideBuffer(int index, Vertex vertex) {
-        mStrideBuffer.rewind();
-        mStrideBuffer.position((Vertex.Vertex_COORD_SIZE + Vertex.Vertex_TEXT_SIZE) * index);
-        mStrideBuffer.put(vertex.x).put(vertex.y).put(vertex.z).put(vertex.u).put(vertex.v);
-        mStrideBuffer.rewind();
-    }
 
     /**
+     * alimenter un buffer avec des coordonées de vertex
+     *
      * @param index
      * @param vertex
      */
-    public void putXYZIntoFbVertices(int index, Vertex vertex) {
+    //public void putXYZIntoFbVertices(int index, Vertex vertex) {
         // la position physique en mémoire des bytes qui représentent le vertex
         // c'est la taille d'un vertex en bytes x l'index
-        mFbVertices.rewind();
+        //mFbVertices.rewind();
         // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
         // prochain vertex
-        mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
-        mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
+        //mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
+        //mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
         // on se repositionne en 0 , prêt pour la relecture
-        mFbVertices.rewind();
+        //mFbVertices.rewind();
 
-    }
+    //}
 
 
     /**
@@ -314,6 +315,7 @@ public class GameObject implements Drawable, Cloneable {
     }
 
     // setter indices
+    /*
     public void putIndice(int index, int indice) {
         // on se positionne a l'index dans le buffer
         // comme on a qu'un seul short a placer on ne fait pas comme dans
@@ -324,7 +326,7 @@ public class GameObject implements Drawable, Cloneable {
         // on se repositionne en z�ro
         mIndices.position(0);
     }
-
+*/
     /**
      * @return
      */
@@ -335,6 +337,7 @@ public class GameObject implements Drawable, Cloneable {
     /**
      * @return
      */
+    /*
     public FloatBuffer getFbVertices() {
 
         for (int i = 0; i < this.mVertices.size(); i++) {
@@ -343,30 +346,18 @@ public class GameObject implements Drawable, Cloneable {
 
         return mFbVertices;
     }
-
+*/
 
     /**
      * @return
      */
     public FloatBuffer getFbTextCood() {
 
-        for (int i = 0; i < this.mVertices.size(); i++) {
-            this.putUVIntoFbTextCoord(i, this.mVertices.get(i));
+        for (int i = 0; i < this.getNbvertex(); i++) {
+            this.putUVIntoFbTextCoord(i, this.getVertices().get(i));
         }
 
         return mTextCoord;
-    }
-
-    /**
-     * @return
-     */
-    public FloatBuffer getStrideBuffer() {
-
-        for (int i = 0; i < this.mVertices.size(); i++) {
-            this.putIntoStrideBuffer(i, this.mVertices.get(i));
-        }
-
-        return mStrideBuffer;
     }
 
 
@@ -377,7 +368,7 @@ public class GameObject implements Drawable, Cloneable {
 
     // getter indices
     public ShortBuffer getIndices() {
-        return mIndices;
+        return null;
     }
 
 
@@ -403,21 +394,9 @@ public class GameObject implements Drawable, Cloneable {
         mTagName = tagid;
     }
 
-    /**
-     * public float getWidth() { return width; }
-     * <p/>
-     * public void setWidth(float width) { // this.width = width; //
-     * updateModelMatrix(); }
-     * <p/>
-     * public float getHeight() { return hight; }
-     * <p/>
-     * public void setHeight(float hight) { this.hight = hight;
-     * updateModelMatrix(); }
-     */
     public void setCoord(float x, float y) {
         this.X = x;
         this.Y = y;
-
     }
 
     /**
@@ -451,9 +430,11 @@ public class GameObject implements Drawable, Cloneable {
      * Dessiner l'objet
      */
     public void draw() {
+
+        ProgramShaderManager PSM = this.getScene().getPSManager();
         // j'utilise le shader prévu
-        ProgramShader sh = this.getScene().getProgramShaderProvider().getShaderByName("simple");
-        this.getScene().getProgramShaderProvider().use(sh);
+        ProgramShader sh = PSM.getShaderByName("simple");
+        PSM.use(sh);
 
 
         if (this.textureEnabled) {
@@ -481,13 +462,11 @@ public class GameObject implements Drawable, Cloneable {
          .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
          */
-        FloatBuffer toto = ByteBuffer.allocateDirect(mVertices.size() * 4 * FLOAT_SIZE)
+        FloatBuffer toto = ByteBuffer.allocateDirect(getNbvertex() * 4 * FLOAT_SIZE)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         toto.rewind();
 
-        float[] aa = {0.f, 1.f, 1.f, 1.f};
-
-        for (int i = 0; i < mVertices.size(); i++) {
+        for (int i = 0; i < getNbvertex(); i++) {
             toto.rewind();
             //on avance dans le buffer à l'endroit où on souhaite écrire
             toto.position(4 * i);
@@ -497,7 +476,6 @@ public class GameObject implements Drawable, Cloneable {
             toto.rewind();
         }
 
-        //toto.put(aa);
 
         toto.rewind();
 
@@ -505,12 +483,12 @@ public class GameObject implements Drawable, Cloneable {
         GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
                 GLES20.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), toto);
 
-/**
- *         GLES20.glVertexAttribPointer(this.attrib_vertex_coord_location, 3,
- GLES20.GL_FLOAT, false, Vertex.Vertex_COORD_SIZE_BYTES, fb);
- Vertex_COORD_SIZE_BYTES = Vertex_COORD_SIZE*FLOAT_SIZE
- Vertex_COORD_SIZE = 3;
- */
+        /**
+         *         GLES20.glVertexAttribPointer(this.attrib_vertex_coord_location, 3,
+         GLES20.GL_FLOAT, false, Vertex.Vertex_COORD_SIZE_BYTES, fb);
+         Vertex_COORD_SIZE_BYTES = Vertex_COORD_SIZE*FLOAT_SIZE
+         Vertex_COORD_SIZE = 3;
+         */
         //--------------------------------------------
         sh.enableShaderVar();
 
@@ -535,7 +513,7 @@ public class GameObject implements Drawable, Cloneable {
         //utilisation des coordonnées stockées
         //------------------------------------------------------------------------
         //je me place sur le vbo
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().vbo[0]);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getGlVBoId());
 
         //on active l'utilisation de la variable aPostion dans le shader
         GLES20.glEnableVertexAttribArray(sh.attrib_vertex_coord_location);
@@ -550,13 +528,13 @@ public class GameObject implements Drawable, Cloneable {
         //utilisation de l'index buffer stocké
         //----------------------------------------------------------------------------
         //je me place sur le buffer des index
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getGlVBiId());
 
         //je dessine les vertex selon l'ordre indiqué dans l'index.
         // au lieu de fournir des valeurs on indique une position en int ce qui permet à opengl de comprendre
         // qu'il faut passer par le pointeur sur lequel on viens de se postionner
         // et il doit lire le buffer à partir de la position zéro
-        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
+        GLES20.glDrawElements(this.drawMode, this.getNbIndex(),
                 GLES20.GL_UNSIGNED_SHORT, 0);
 
         //je pointe les buffer sur "rien" pour ne pas les réutiliser par erreur
@@ -583,13 +561,14 @@ public class GameObject implements Drawable, Cloneable {
      *
      */
 
-    public void drawWithStride() {
+    public void drawWithStride(float[] projectionMatrix) {
         // j'utilise le shader prévu
-        ProgramShader sh = this.getScene().getProgramShaderProvider().getShaderByName("simple");
-        this.getScene().getProgramShaderProvider().use(sh);
+        //TODO on pourrais faire une fonction dans le PSManage pour faire cette action
+        //TODO ici il n'y aurrait qu'à appeler le shader par son nom
+        ProgramShader sh = this.getScene().getPSManager().getShaderByName("simple");
+        this.getScene().getPSManager().use(sh);
 
-
-        //si la texture est active on l'utilise
+        //si l'utilisation d'une texture est active on l'utilise
         if (this.textureEnabled) {
 
             //on active l'unité de traitement des textures 0
@@ -597,6 +576,7 @@ public class GameObject implements Drawable, Cloneable {
 
             // on demande à opengl d'utiliser la texture
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
+
             //on fait pointer  uniform_texture_location sur le buffer où est la texture
             GLES20.glUniform1i(sh.uniform_texture_location, 0);
         }
@@ -607,96 +587,18 @@ public class GameObject implements Drawable, Cloneable {
          * qui contient les couleurs de chaques vertex !!
          * pour rappel, on a 1 vertex Shader par vertex !!!
          *
-         *
-         *
          * Si tous les vertex ont la même couleur , on peu simplement utiliser un Uniform
          * car les uniforms sont connus pour tous les vertex shader
          */
 
         //--------------------------------------------
 
-        FloatBuffer toto = ByteBuffer.allocateDirect(mVertices.size() * 4 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        toto.rewind();
-
-        if (P1 ||P6) {
-            colorR += 0.01F;
-        }
-        if (colorR > 1) {
-            P1 = false;
-            P2 = true;
-        }
-
-        if (P2) {
-            colorV += 0.01F;
-        }
-        if (colorV > 1) {
-            P2 = false;
-            P3 = true;
-        }
-
-        if (P3){
-            colorR-=0.01f;
-        }
-
-        if (P3 && colorR<0){
-            P3 = false;
-            P4=true;
-        }
-
-        if (P4){
-            colorB += 0.01f;
-        }
-
-        if (P4 &&colorB>1){
-            P4=false;
-            P5=true;
-        }
-
-        if (P5){
-            colorV-=0.01f;
-        }
-
-        if (P5 && colorV<0){
-            P5 = false;
-            P6 = true;
-        }
-
-            if (P6 && colorR>1){
-                colorV+=0.01f;
-            }
-
-        if (colorR>1 && colorV>1 && colorB>1){
-            P1 = true;
-            P2 = P3 = P4 = P5 =P6  = false;
-            colorR = colorV = colorB = 0f;
-        }
-
-        for (int i = 0; i < mVertices.size(); i++) {
-            toto.rewind();
-            //on avance dans le buffer à l'endroit où on souhaite écrire
-            toto.position(4 * i);
-            //on écrit les coordonées de texture
-            toto.put(colorR).put(colorV).put(colorB).put(1f);
-            // on se repositionne en 0 , prêt pour la lecture
-            toto.rewind();
-        }
-
-        //toto.put(aa);
-
-        toto.rewind();
-
-        //4 float dont la taille est 4*taille d'un float
-        GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
-                GLES20.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), toto);
 
         //--------------------------------------------
 
 
-        final int stride = (Vertex.Vertex_COORD_SIZE + Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE;
-
         //je me place sur le buffer stride qui contient x,y,z,u,v
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getScene().strideBuffer[0]);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, this.getGlVBoId());
 
         //lecture des coordonées x,y,z:
         // plutôt que de passer des valeur au shader, on indique une position en int.
@@ -704,15 +606,18 @@ public class GameObject implements Drawable, Cloneable {
         // se positionner pour aller chercher les valeurs contenue dans la mémoire graphique
         // ici on commence à lire le buffer à partir de la position zéro et on fait des saut
         // de "stride=5" pour passer aux coordonnées suivantes
-        GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, 3,
-                GLES20.GL_FLOAT, false, stride, 0);
+        GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, Vertex.Vertex_COORD_SIZE,
+                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, 0);
 
-        //Chargement des coodonées de texture
         //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
         // ensuite on fait des saut pour lire les suivantes
-        GLES20.glVertexAttribPointer(sh.attrib_texture_coord_location, 2,
-                GLES20.GL_FLOAT, false, stride, Vertex.Vertex_TEXT_SIZE * Vertex.FLOAT_SIZE);
+        GLES20.glVertexAttribPointer(sh.attrib_texture_coord_location, Vertex.Vertex_TEXT_SIZE,
+                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, Vertex.Vertex_COORD_SIZE * Vertex.FLOAT_SIZE);
 
+        //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
+        // ensuite on fait des saut pour lire les suivantes
+        GLES20.glVertexAttribPointer(sh.attrib_color_location, Vertex.Vertex_COLOR_SIZE,
+                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, (Vertex.Vertex_COORD_SIZE+Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE);
 
         //--------------------------------------------
         sh.enableShaderVar();
@@ -737,12 +642,18 @@ public class GameObject implements Drawable, Cloneable {
         GLES20.glUniform1f(sh.uniform_alpha_location, this.getAlpha());
 
         //je me place sur le buffer des index
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getScene().vboi[0]);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getGlVBiId());
 
         //je dessine les vertex selon l'ordre indiqué dans l'index.
         // au lieu de fournir des valeurs on indique zéro. ce qui permet à opengl de comprendre
         // qu'il faut passer par le pointeur sur lequel on viens de se postionner
-        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
+        ///this.drawMode = GLES20.GL_LINES;
+        //drawElement
+        // mode de dessin
+        //nombre d'indices (en théorie = 6)
+        //
+
+        GLES20.glDrawElements(this.drawMode, this.getNbIndex(),
                 GLES20.GL_UNSIGNED_SHORT, 0);
 
         //je pointe les buffer sur "rien" pour ne pas les réutiliser par erreur
@@ -754,7 +665,7 @@ public class GameObject implements Drawable, Cloneable {
             this.mCollisionBox.update();
             if (mCollisionBox.isVisible) {
                 //on dessine la colission Box en réutilisant la même MVP
-                this.mCollisionBox.draw(mMvp);
+//                this.mCollisionBox.draw(mMvp);
             }
         }
 
@@ -780,10 +691,10 @@ public class GameObject implements Drawable, Cloneable {
 
         // je suis obligé de passer par un vecteur 4 pour la multiplication
 
-        for (int i = 0; i < this.mVertices.size(); i++) {
-            oldVerticesCoord[0] = this.mVertices.get(i).x; // x
-            oldVerticesCoord[1] = this.mVertices.get(i).y; // y
-            oldVerticesCoord[2] = this.mVertices.get(i).z; // z
+        for (int i = 0; i < this.getNbvertex(); i++) {
+            oldVerticesCoord[0] = this.getVertices().get(i).x; // x
+            oldVerticesCoord[1] = this.getVertices().get(i).y; // y
+            oldVerticesCoord[2] = this.getVertices().get(i).z; // z
             oldVerticesCoord[3] = 1.f;
 
             Matrix.multiplyMV(newVerticesCoord, 0, modelView, 0,
@@ -831,11 +742,9 @@ public class GameObject implements Drawable, Cloneable {
 
     /**
      * Fonction de mise à jour générale
-     *
-     * @param openGLActivity
      */
 
-    public void mainUpdate(OpenGLActivity openGLActivity) {
+    public void mainUpdate() {
 
         // traiter les opérations diverses à effectuer lors de
         // la mise à jour
@@ -949,14 +858,7 @@ public class GameObject implements Drawable, Cloneable {
         gameobject.mCollideWithList = new ArrayList<GameObject>();
         gameobject.mGameObjectToListenList = new ArrayList<GameObject>();
 
-        gameobject.mVertices = new ArrayList<Vertex>();
 
-        for (Vertex v : this.mVertices) {
-            Vertex vv = v.clone();
-
-            gameobject.mVertices.add(vv);
-
-        }
 
         // on r�initialise le lien de parent� avec l'animation
         /**

@@ -24,7 +24,7 @@ import android.util.Log;
 /**
  * TextureProvider : class servant à gérer les textures
  */
-public class TextureProvider {
+public class TextureManager {
 
     private Activity mActivity;
     private ArrayList<Texture> textureList;
@@ -34,7 +34,7 @@ public class TextureProvider {
      *
      * @param activity
      */
-    public TextureProvider(Activity activity) {
+    public TextureManager(Activity activity) {
         this.setTextureList(new ArrayList<Texture>());
         this.setActivity(activity);
     }
@@ -57,9 +57,9 @@ public class TextureProvider {
         return this.mActivity;
     }
 
-    public void initialize() {
+    public void initializeGLContext() {
         this.initGlTextureParam();
-        this.initGlBuffer();
+        this.initGlTextureBuffer();
     }
 
     /**
@@ -99,9 +99,6 @@ public class TextureProvider {
     }
 
 
-
-
-
     /**
      * Recherche d'une texture via son ID dans la liste des textures
      * @param ressourceId
@@ -126,7 +123,7 @@ public class TextureProvider {
      *    il faut donc que toutes les textures utilisées par la la scène soient référencées en amont
      *    dans le provider.
      */
-    private void initGlBuffer() {
+    private void initGlTextureBuffer() {
 
         //On récupère le nombre de textures à traiter
         int nbTextures = this.getTextureList().size();

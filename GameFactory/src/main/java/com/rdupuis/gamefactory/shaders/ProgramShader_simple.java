@@ -42,8 +42,10 @@ public class ProgramShader_simple extends ProgramShader {
                 + " varying vec4 vVertexColor;"
                 + " void main() {"
 
-                 + "    gl_FragColor =  vVertexColor;"
-              //  + "gl_FragColor = texture2D(" + FSH_UNIFORM_TEXTURE + ", vTextureCoord) * " + this.FSH_UNIFORM_ALPHA + "* vVertexColor; "
+               //   + "    gl_FragColor =  vec4(1.,1.,1.,1.);"
+
+              //   + "    gl_FragColor =  vVertexColor;"
+                + "gl_FragColor = texture2D(" + FSH_UNIFORM_TEXTURE + ", vTextureCoord) * " + this.FSH_UNIFORM_ALPHA + "* vVertexColor; "
                 // +
                 // "    gl_FragColor =  vec4(sin(pos.x), sin(pos.y), 0.0, 1.0);"
                 + " " + "}";

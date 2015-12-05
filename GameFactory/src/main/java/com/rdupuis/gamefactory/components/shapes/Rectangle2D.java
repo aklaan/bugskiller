@@ -1,140 +1,161 @@
 package com.rdupuis.gamefactory.components.shapes;
 
 import android.os.SystemClock;
+
 import com.rdupuis.gamefactory.components.Shape;
 import com.rdupuis.gamefactory.components.Vertex;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.utils.CONST;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
 
 public class Rectangle2D extends Shape {
 
-	static final int NB_RECTANGLE_VERTEX = 4;
-	//private float width = 1;
-	//private float height = 1;
-	private boolean firstFrame = true;
-	float startTime;
+    static final int NB_RECTANGLE_VERTEX = 4;
+    //private float width = 1;
+    //private float height = 1;
+    private boolean firstFrame = true;
+    float startTime;
+    private DrawingMode mDrawingMode;
 
-	public Rectangle2D(DrawingMode drawingMode) {
-		super();
 
-		// on ajoute les vertex (x,y,zu,v)
-		this.mVertices.add(new Vertex(-0.5f, 0.5f, 0f, 0f, 0f));
-		this.mVertices.add(new Vertex(-0.5f, -0.5f, 0f, 0f, 1f));
-		this.mVertices.add(new Vertex(0.5f, -0.5f, 0f, 1f, 1f));
-		this.mVertices.add(new Vertex(0.5f, 0.5f, 0, 1f, 0f));
+    public Rectangle2D(DrawingMode drawingMode) {
+        super();
 
-		startTime = SystemClock.elapsedRealtime();
-		switch (drawingMode) {
-		// on dessine que les lignes de contour
-		case EMPTY:
+        this.mDrawingMode = drawingMode;
+        this.setNbvertex(NB_RECTANGLE_VERTEX);
+        this.setNbIndex((drawingMode == DrawingMode.FILL) ? 6 : 8);
+    }
 
-			this.initBuffers(8);
-			this.putIndice(0, 0);
-			this.putIndice(1, 1);
 
-			this.putIndice(2, 1);
-			this.putIndice(3, 2);
+    @Override
+    public ArrayList<Vertex> getVertices() {
 
-			this.putIndice(4, 2);
-			this.putIndice(5, 3);
+        ArrayList<Vertex> temp = new ArrayList<Vertex>();
+        // on ajoute les vertex (x,y,zu,v)
+        temp.add(new Vertex(-0.5f, 0.5f, 0f, 0f, 0f,1f,1f,1f,0.5f));
+        temp.add(new Vertex(-0.5f, -0.5f, 0f, 0f, 1f,1f,1f,1f,0.5f));
+        temp.add(new Vertex(0.5f, -0.5f, 0f, 1f, 1f,1f,1f,1f,0.5f));
+        temp.add(new Vertex(0.5f, 0.5f, 0, 1f, 0f,1f,1f,1f,0.5f));
 
-			this.putIndice(6, 3);
-			this.putIndice(7, 0);
+        return temp;
 
-			break;
-		// on dessine des triangles plein
-		case FILL:
+    }
 
-			this.initBuffers(6);
 
-			// on indique l'ordre dans lequel on doit affichier les vertex
-			// pour dessiner les 2 triangles qui vont former le carré.
-			this.putIndice(0, 0);
-			this.putIndice(1, 1);
-			this.putIndice(2, 2);
+    @Override
+    public ShortBuffer getIndices() {
 
-			this.putIndice(3, 0);
-			this.putIndice(4, 2);
-			this.putIndice(5, 3);
-			break;
-		}
+        ShortBuffer result = null;
 
-	}
+        switch (this.mDrawingMode) {
+            // on dessine que les lignes de contour
+            case EMPTY:
 
-	@Override
-	public void onUpdate() {
-		
-	}
-	
-	public void onUpdate2() {
-		// TODO Auto-generated method stub
+                result = ByteBuffer.allocateDirect(8 * CONST.SHORT_SIZE)
+                        .order(ByteOrder.nativeOrder()).asShortBuffer();
+                result.rewind();
 
-		/**
-		 * 
-		 * (0)*-----------*(3) | | | | | | | | (1)*-----------*(2)
-		 */
+                result.put((short) 0).put((short) 1)
+                        .put((short) 1).put((short) 2)
+                        .put((short) 2).put((short) 3)
+                        .put((short) 3).put((short) 0);
+                result.rewind();
 
-		float decalage = 0.2f;
-		float elapsedTime = SystemClock.elapsedRealtime() - startTime;
+                break;
+            // on dessine des triangles plein
+            case FILL:
 
-		if (elapsedTime >1000){
-			startTime = SystemClock.elapsedRealtime();
-		
-		if (firstFrame) {
-			this.mVertices.get(0).u = 0;
-			this.mVertices.get(1).u = 0;
-			this.mVertices.get(2).u = decalage;
-			this.mVertices.get(3).u = decalage;
-           firstFrame = false;
-		} else {
-		
-		
-		
-		this.mVertices.get(0).u += decalage;
-		this.mVertices.get(1).u += decalage;
-		this.mVertices.get(2).u += decalage;
-		this.mVertices.get(3).u += decalage;
-		}
-		//Si au prochain dcale on dépasse, on revient
-		// sur la first frame
-		if (this.mVertices.get(3).u + decalage > 1){
-			
-			this.firstFrame = true;
-			
-			}
-			
-		}
-	}
+                result = ByteBuffer.allocateDirect(6 * CONST.SHORT_SIZE)
+                        .order(ByteOrder.nativeOrder()).asShortBuffer();
+
+                result.put((short) 0).put((short) 1).put((short) 2)
+                        .put((short) 0).put((short) 2).put((short) 3);
+
+
+                // on indique l'ordre dans lequel on doit afficher les vertex
+                // pour dessiner les 2 triangles qui vont former le carré.
+
+        }
+        result.rewind();
+        return result;
+
+    }
+
+    @Override
+    public void onUpdate() {
+
+    }
 /*
-	public void setHeight(float h) {
-		this.height = h;
-		//updateVertices();
-		if (this.canCollide) {
-			this.mCollisionBox.update();
-		}
-	}
+    public void onUpdate2() {
 
-	public float getHeight() {
-		return this.height;
-	}
+        float decalage = 0.2f;
+        float elapsedTime = SystemClock.elapsedRealtime() - startTime;
 
-	public float getWidth() {
-		return this.width;
-	}
+        if (elapsedTime > 1000) {
+            startTime = SystemClock.elapsedRealtime();
 
-	public void setWidth(float w) {
-		this.width = w;
-		//updateVertices();
-		if (this.canCollide) {
-			this.mCollisionBox.update();
-		}
-	}
+            if (firstFrame) {
+                this.mVertices.get(0).u = 0;
+                this.mVertices.get(1).u = 0;
+                this.mVertices.get(2).u = decalage;
+                this.mVertices.get(3).u = decalage;
+                firstFrame = false;
+            } else {
+
+
+                this.mVertices.get(0).u += decalage;
+                this.mVertices.get(1).u += decalage;
+                this.mVertices.get(2).u += decalage;
+                this.mVertices.get(3).u += decalage;
+            }
+            //Si au prochain dcale on dépasse, on revient
+            // sur la first frame
+            if (this.mVertices.get(3).u + decalage > 1) {
+
+                this.firstFrame = true;
+
+            }
+
+        }
+    }
 */
-	private void updateVertices() {
 
-		// comme le 0,0 est au milieu on divise par 2
+    /*
+        public void setHeight(float h) {
+            this.height = h;
+            //updateVertices();
+            if (this.canCollide) {
+                this.mCollisionBox.update();
+            }
+        }
+
+        public float getHeight() {
+            return this.height;
+        }
+
+        public float getWidth() {
+            return this.width;
+        }
+
+        public void setWidth(float w) {
+            this.width = w;
+            //updateVertices();
+            if (this.canCollide) {
+                this.mCollisionBox.update();
+            }
+        }
+    */
+    private void updateVertices() {
+
+        // comme le 0,0 est au milieu on divise par 2
 
 		/*
-		float w = (float) width / 2;
+        float w = (float) width / 2;
 		float h = (float) height / 2;
 
 		this.mVertices.get(0).x = -w;
@@ -149,7 +170,7 @@ public class Rectangle2D extends Shape {
 		this.mVertices.get(3).x = w;
 		this.mVertices.get(3).y = h;
 */
-	}
+    }
 
 
 }
