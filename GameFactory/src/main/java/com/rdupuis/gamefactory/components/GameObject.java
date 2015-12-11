@@ -12,6 +12,7 @@ import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
+import com.rdupuis.gamefactory.utils.Tools;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -19,8 +20,7 @@ import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class GameObject implements Drawable, Cloneable {
-
+public class GameObject implements  Cloneable {
 
     //Id du buffer Gl où se trouvent les vertex
     private int glVBoId;
@@ -121,8 +121,6 @@ public class GameObject implements Drawable, Cloneable {
     }
 
     private float height;
-    //boite de colission de l'objet
-    public CollisionBox mCollisionBox;
 
     // tableau des objets avec lesquel le gameobject rentre en collision
     public ArrayList<GameObject> mCollideWithList;
@@ -162,13 +160,13 @@ public class GameObject implements Drawable, Cloneable {
     // soit : 00000000 00000000
 
     //liste des vertex composant l'objet
-   // public ArrayList<Vertex> mVertices;
+    // public ArrayList<Vertex> mVertices;
 
 
     // ! Vertices
     // définition d'un buffer conteant les coordonées des vertices
     // TODO: ce buffer n'est pas censé rester en mémoire client
-  //  public FloatBuffer mFbVertices;
+    //  public FloatBuffer mFbVertices;
 
     // ! indices
     //Définition d'un buffer contenant les indices représentant l'ordre dans lequel
@@ -182,13 +180,17 @@ public class GameObject implements Drawable, Cloneable {
     private FloatBuffer mTextCoord;
 
 
+    /**********************************************************************
+     * getter & setter
+     **********************************************************************/
+
     /**
      * Constructeur
      */
     public GameObject() {
 
         //Initalisation des Valeurs par défaut :
-        //l'Alpha est à 100%
+        //l'Alpha ambiant est à 100%
         this.setAlpha(1);
 
         //taille par défaut
@@ -196,7 +198,7 @@ public class GameObject implements Drawable, Cloneable {
         this.height = 1;
 
         //pas de rendu des texture par défaut
-        textureEnabled = false;
+        this.textureEnabled = false;
 
         //pas de tagname
         mTagName = "";
@@ -204,16 +206,13 @@ public class GameObject implements Drawable, Cloneable {
         //visible par défaut
         isVisible = true;
 
-        //la matrice de rotation est nulle
-        //Matrix.setIdentityM(this.mRotationMatrix, 0);
-
+        //TODO : cette liste doit être géré par le manager et non dans l'objet
         this.mCollideWithList = new ArrayList<GameObject>();
+
         this.mGameObjectToListenList = new ArrayList<GameObject>();
-       // this.mVertices = new ArrayList<Vertex>();
 
 
     }
-
 
     //cette fonction est à overrider par les GameObject
     public ArrayList<Vertex> getVertices() {
@@ -241,12 +240,10 @@ public class GameObject implements Drawable, Cloneable {
         return this.mGameObjectToListenList;
     }
 
-
     /**
      * Activer la gestion des colisions
      */
     public void enableColision() {
-        this.mCollisionBox = new CollisionBox(this);
         this.canCollide = true;
     }
 
@@ -254,9 +251,8 @@ public class GameObject implements Drawable, Cloneable {
      * désactiver la gestion des colisions
      */
     public void disableColision() {
-        this.mCollisionBox = null;
-        this.canCollide = false;
-        this.mCollideWithList.clear();
+         this.canCollide = false;
+        //TODO : cette liste doit être géré par le manager et non dans l'objet
 
     }
 
@@ -268,15 +264,15 @@ public class GameObject implements Drawable, Cloneable {
      * @param vertex
      */
     //public void putXYZIntoFbVertices(int index, Vertex vertex) {
-        // la position physique en mémoire des bytes qui représentent le vertex
-        // c'est la taille d'un vertex en bytes x l'index
-        //mFbVertices.rewind();
-        // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
-        // prochain vertex
-        //mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
-        //mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
-        // on se repositionne en 0 , prêt pour la relecture
-        //mFbVertices.rewind();
+    // la position physique en mémoire des bytes qui représentent le vertex
+    // c'est la taille d'un vertex en bytes x l'index
+    //mFbVertices.rewind();
+    // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
+    // prochain vertex
+    //mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
+    //mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
+    // on se repositionne en 0 , prêt pour la relecture
+    //mFbVertices.rewind();
 
     //}
 
@@ -327,6 +323,7 @@ public class GameObject implements Drawable, Cloneable {
         mIndices.position(0);
     }
 */
+
     /**
      * @return
      */
@@ -429,9 +426,9 @@ public class GameObject implements Drawable, Cloneable {
     /**
      * Dessiner l'objet
      */
-    public void draw() {
+    public void draw(Scene scene) {
 
-        ProgramShaderManager PSM = this.getScene().getPSManager();
+        ProgramShaderManager PSM = scene.getPSManager();
         // j'utilise le shader prévu
         ProgramShader sh = PSM.getShaderByName("simple");
         PSM.use(sh);
@@ -547,13 +544,6 @@ public class GameObject implements Drawable, Cloneable {
         // renderer.mModelView = this.mBackupModelView;
         // renderer.mProgramme1.disableVertexAttribArray();
 
-        if (this.canCollide) {
-            this.mCollisionBox.update();
-            if (mCollisionBox.isVisible) {
-                this.mCollisionBox.draw();
-            }
-        }
-
     }
 
 
@@ -607,17 +597,17 @@ public class GameObject implements Drawable, Cloneable {
         // ici on commence à lire le buffer à partir de la position zéro et on fait des saut
         // de "stride=5" pour passer aux coordonnées suivantes
         GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, Vertex.Vertex_COORD_SIZE,
-                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, 0);
+                GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, 0);
 
         //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
         // ensuite on fait des saut pour lire les suivantes
         GLES20.glVertexAttribPointer(sh.attrib_texture_coord_location, Vertex.Vertex_TEXT_SIZE,
-                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, Vertex.Vertex_COORD_SIZE * Vertex.FLOAT_SIZE);
+                GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, Vertex.Vertex_COORD_SIZE * Vertex.FLOAT_SIZE);
 
         //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
         // ensuite on fait des saut pour lire les suivantes
         GLES20.glVertexAttribPointer(sh.attrib_color_location, Vertex.Vertex_COLOR_SIZE,
-                GLES20.GL_FLOAT, false, Vertex.stride*Vertex.FLOAT_SIZE, (Vertex.Vertex_COORD_SIZE+Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE);
+                GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, (Vertex.Vertex_COORD_SIZE + Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE);
 
         //--------------------------------------------
         sh.enableShaderVar();
@@ -661,52 +651,11 @@ public class GameObject implements Drawable, Cloneable {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
 
-        if (this.canCollide) {
-            this.mCollisionBox.update();
-            if (mCollisionBox.isVisible) {
-                //on dessine la colission Box en réutilisant la même MVP
-//                this.mCollisionBox.draw(mMvp);
-            }
-        }
+
+
 
     }
 
-
-    /**
-     * Cette fonction permet de récupérer les coordonées de vertex à l'écran
-     * en multipliant le vertex par la matrice MVP
-     *
-     * @param modelView
-     * @return
-     */
-    public ArrayList<Vertex> applyModelView(float[] modelView) {
-
-        // on récupère les vertices de l'objet
-        // et on calcule leur coordonées dans le monde
-        float[] oldVerticesCoord = new float[4];
-        float[] newVerticesCoord = new float[4];
-
-        // définition d'un tableau de flotants
-        ArrayList<Vertex> mModelViewVertices = new ArrayList<Vertex>();
-
-        // je suis obligé de passer par un vecteur 4 pour la multiplication
-
-        for (int i = 0; i < this.getNbvertex(); i++) {
-            oldVerticesCoord[0] = this.getVertices().get(i).x; // x
-            oldVerticesCoord[1] = this.getVertices().get(i).y; // y
-            oldVerticesCoord[2] = this.getVertices().get(i).z; // z
-            oldVerticesCoord[3] = 1.f;
-
-            Matrix.multiplyMV(newVerticesCoord, 0, modelView, 0,
-                    oldVerticesCoord, 0);
-            mModelViewVertices.add(new Vertex(newVerticesCoord[0],
-                    newVerticesCoord[1], newVerticesCoord[2]));
-
-        }
-
-        return mModelViewVertices;
-
-    }
 
     /**
      * Mise à jour de la ModelView pour prendre en compte les
@@ -750,41 +699,19 @@ public class GameObject implements Drawable, Cloneable {
         // la mise à jour
         this.onUpdate();
 
-        // traiter les actions a faire en cas de colissions
-        this.applyCollisions();
 
         // A la fin des mises à jour on connais les nouvelles coordonées
         // on peut calculer la nouvelle matrice modelView
         this.updateModelView();
 
-        // -----------------------------------------
-        // Mettre a jour la boite de colision si elle existe
-        // ------------------------------------------
-        if (this.canCollide) {
-            this.mCollisionBox.update();
-        }
-
-        // -----------------------------------------------------
+             // -----------------------------------------------------
         // Traiter les évènements écoutés sur les autres objets
         // -----------------------------------------------------
         updateListerners();
 
-
     }
 
-    /***************************************************
-     * Traiter des colisions avec les autres objets
-     ***************************************************/
-    public void applyCollisions() {
 
-        if (!this.mCollideWithList.isEmpty()) {
-            for (GameObject go : this.mCollideWithList) {
-
-                onCollideWith(go);// newTextureId = R.string.textureRobot;
-            }
-        }
-
-    }
 
 
     /********************************************************
@@ -804,14 +731,6 @@ public class GameObject implements Drawable, Cloneable {
 
     }
 
-    /**************************************************************************
-     * Actions a effectuer en cas de colission avec un autre Objet
-     *
-     * @param gameObject
-     *************************************************************************/
-    public void onCollideWith(GameObject gameObject) {
-
-    }
 
     /**************************************************************************
      * Actions effectuer lorsque l'on écoute les objets
@@ -857,7 +776,6 @@ public class GameObject implements Drawable, Cloneable {
 
         gameobject.mCollideWithList = new ArrayList<GameObject>();
         gameobject.mGameObjectToListenList = new ArrayList<GameObject>();
-
 
 
         // on r�initialise le lien de parent� avec l'animation

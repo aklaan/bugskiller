@@ -198,12 +198,7 @@ public class Starship extends Rectangle2D {
 		// si la forme poss�de une boite de colision et que l'on souhaite la
 		// voir
 		// a l'�cran, on la dessine.
-		if (this.canCollide) {
-			// this.mCollisionBox.update();
-			if (mCollisionBox.isVisible) {
-				this.mCollisionBox.draw();
-			}
-		}
+
 
 	}
 

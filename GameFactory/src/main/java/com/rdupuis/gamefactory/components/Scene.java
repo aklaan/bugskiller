@@ -10,7 +10,8 @@ import com.rdupuis.gamefactory.animations.AnimationManager;
 import com.rdupuis.gamefactory.providers.GameObjectManager;
 import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.providers.TextureManager;
-import com.rdupuis.gamefactory.utils.CollisionControler;
+import com.rdupuis.gamefactory.utils.ColliderManager;
+
 
 import java.util.ArrayList;
 
@@ -25,6 +26,8 @@ public class Scene implements GLSurfaceView.Renderer {
     private VIEW_MODE mViewMode;
     private OpenGLActivity mActivity;
 
+
+    private ColliderManager mColliderManager;
     private TextureManager mTextureManager;
     private AnimationManager animationManager;
     private GameObjectManager mGameObjectManager;
@@ -127,6 +130,13 @@ public class Scene implements GLSurfaceView.Renderer {
         return this.mProjectionView;
     }
 
+    public ColliderManager getColliderManager() {
+        return mColliderManager;
+    }
+
+    public void setColliderManager(ColliderManager colliderManager) {
+        this.mColliderManager = colliderManager;
+    }
 
     /**
      * Constructeur
@@ -143,6 +153,7 @@ public class Scene implements GLSurfaceView.Renderer {
         setPSManager(new ProgramShaderManager(activity));
         setAnimationManager(new AnimationManager());
         setGOManager(new GameObjectManager(this));
+        setColliderManager(new ColliderManager());
 
         this.mCamera = new Camera();
         this.mCamera.centerZ = 100;
@@ -189,6 +200,9 @@ public class Scene implements GLSurfaceView.Renderer {
 
         //chargement des objets le contexte OpenGl
         this.getGOManager().initializeGLContext();
+
+        //on initialise les boites de colision
+        this.getColliderManager().initBoxes(this.getGOManager());
 
         // on défini la couleur de base pour initialiser le BUFFER de rendu
         // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -316,7 +330,7 @@ public class Scene implements GLSurfaceView.Renderer {
          * pour éviter le problème, on ne chek pas les colissions sur la première Frame
          */
         if (!firstFrame) {
-            CollisionControler.checkAllCollisions(getGOManager().GOList());
+            this.getColliderManager().updateCollisionsList();
         }
 
         /**
@@ -388,17 +402,6 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
-    /**
-     * Ajouter une liste de GameObject dans une scène
-     *
-     * @param GameObjectList
-     */
-    public void addToScene(ArrayList<GameObject> GameObjectList) {
-        for (GameObject go : GameObjectList) {
-            go.setScene(this);
-        }
-        this.getGOManager().addAll(GameObjectList);
-    }
 
 
     /**

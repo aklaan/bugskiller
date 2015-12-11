@@ -37,10 +37,10 @@ public class Rectangle2D extends Shape {
 
         ArrayList<Vertex> temp = new ArrayList<Vertex>();
         // on ajoute les vertex (x,y,zu,v)
-        temp.add(new Vertex(-0.5f, 0.5f, 0f, 0f, 0f,1f,1f,1f,0.5f));
-        temp.add(new Vertex(-0.5f, -0.5f, 0f, 0f, 1f,1f,1f,1f,0.5f));
-        temp.add(new Vertex(0.5f, -0.5f, 0f, 1f, 1f,1f,1f,1f,0.5f));
-        temp.add(new Vertex(0.5f, 0.5f, 0, 1f, 0f,1f,1f,1f,0.5f));
+        temp.add(new Vertex(-0.5f, 0.5f, 0f, 0f, 0f, 1f, 1f, 1f, 0.5f));
+        temp.add(new Vertex(-0.5f, -0.5f, 0f, 0f, 1f, 1f, 1f, 1f, 0.5f));
+        temp.add(new Vertex(0.5f, -0.5f, 0f, 1f, 1f, 1f, 1f, 1f, 0.5f));
+        temp.add(new Vertex(0.5f, 0.5f, 0, 1f, 0f, 1f, 1f, 1f, 0.5f));
 
         return temp;
 
@@ -55,27 +55,12 @@ public class Rectangle2D extends Shape {
         switch (this.mDrawingMode) {
             // on dessine que les lignes de contour
             case EMPTY:
-
-                result = ByteBuffer.allocateDirect(8 * CONST.SHORT_SIZE)
-                        .order(ByteOrder.nativeOrder()).asShortBuffer();
-                result.rewind();
-
-                result.put((short) 0).put((short) 1)
-                        .put((short) 1).put((short) 2)
-                        .put((short) 2).put((short) 3)
-                        .put((short) 3).put((short) 0);
-                result.rewind();
-
+                result = getIndicesForEmptyRec();
                 break;
             // on dessine des triangles plein
             case FILL:
 
-                result = ByteBuffer.allocateDirect(6 * CONST.SHORT_SIZE)
-                        .order(ByteOrder.nativeOrder()).asShortBuffer();
-
-                result.put((short) 0).put((short) 1).put((short) 2)
-                        .put((short) 0).put((short) 2).put((short) 3);
-
+                result = getIndicesForFillRec();
 
                 // on indique l'ordre dans lequel on doit afficher les vertex
                 // pour dessiner les 2 triangles qui vont former le carré.
@@ -85,6 +70,36 @@ public class Rectangle2D extends Shape {
         return result;
 
     }
+
+    public static ShortBuffer getIndicesForEmptyRec() {
+        ShortBuffer indices;
+        indices = ByteBuffer.allocateDirect(8 * CONST.SHORT_SIZE)
+                .order(ByteOrder.nativeOrder()).asShortBuffer();
+        indices.rewind();
+
+        indices.put((short) 0).put((short) 1)
+                .put((short) 1).put((short) 2)
+                .put((short) 2).put((short) 3)
+                .put((short) 3).put((short) 0);
+        indices.rewind();
+
+        return indices;
+
+    }
+
+
+    public static ShortBuffer getIndicesForFillRec() {
+        ShortBuffer indices;
+        indices = ByteBuffer.allocateDirect(6 * CONST.SHORT_SIZE)
+                .order(ByteOrder.nativeOrder()).asShortBuffer();
+
+        indices.put((short) 0).put((short) 1).put((short) 2)
+                .put((short) 0).put((short) 2).put((short) 3);
+
+        return indices;
+
+    }
+
 
     @Override
     public void onUpdate() {

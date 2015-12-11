@@ -5,6 +5,8 @@ import com.rdupuis.gamefactory.enums.DrawingMode;
 import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
+import com.rdupuis.gamefactory.utils.CONST;
+import com.rdupuis.gamefactory.utils.Tools;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -12,46 +14,105 @@ import android.opengl.Matrix;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
-public class CollisionBox extends Rectangle2D {
+public class CollisionBox {
 
-    public float offsetX;
-    public float offsetY;
-    public GameObject parent;
+    private final float defaultOffset = 0.1f;
+
+    //je pense qu'il est préférable de mémoriser l'objet plutôt
+    //qu'un ID car il est fort probable que JAVA utilise un pointeur vers l'objet
+    //si on utilise un id, on va devoir faire un calcul pour retrouver l'objet dans
+    // la liste
+    private GameObject mGameObject;
+    private ArrayList<Vertex> mInnerVertices;
+    private Boolean visibility;
+
     //tableau de vertices pour les coordonées world de la boite
     public ArrayList<Vertex> mWorldVertices; // d�finition d'un tableau de vertex
 
-
-    public CollisionBox(GameObject go) {
-        super(DrawingMode.EMPTY);
-        this.isVisible = false;
-        this.drawMode = GLES20.GL_LINES;
-        this.mWorldVertices = new ArrayList<Vertex>();
-        this.offsetX = .05f;
-        this.offsetY = .05f;
-        this.parent = go;
-
+    /*****************************************************************************
+     * getter & setter
+     *****************************************************************************/
+    public ArrayList<Vertex> getVertices() {
+        return mWorldVertices;
     }
 
-    public String getTagName() {
-        return this.parent.getTagName();
-
-    }
-
-    public Scene getScene() {
-        return this.parent.getScene();
+    public void setVertices(ArrayList<Vertex> mWorldVertices) {
+        this.mWorldVertices = mWorldVertices;
     }
 
 
-    public void update() {
+    public Boolean isVisible() {
+        return visibility;
+    }
+
+    public void setVisibility(Boolean visibility) {
+        this.visibility = visibility;
+    }
+
+    public ArrayList<Vertex> getInnerVertices() {
+        return mInnerVertices;
+    }
+
+    public void setInnerVertices(ArrayList<Vertex> mInnerVertices) {
+        this.mInnerVertices = mInnerVertices;
+    }
 
 
-        // aller rechercher les points limite de la forme et en déduire
-        // un rectangle avec un retrait edgelimit
+    /**
+     * gette & setter
+     */
 
-        // naviguer dans le float buffer des x,y,z
 
+    public GameObject getGameObject() {
+        return mGameObject;
+    }
+
+    public void setGameObject(GameObject gameObject) {
+        this.mGameObject = gameObject;
+    }
+
+    /**
+     * Constructor 1 : avec offset
+     */
+    public CollisionBox(GameObject gameObject, float offsetX, float offsetY) {
+        this.commonInitialization(gameObject);
+        this.initInnerVertices(offsetX, offsetX);
+    }
+
+    /**
+     * Contructor 2 : avec offset par defaut
+     *
+     * @param gameObject
+     */
+    public CollisionBox(GameObject gameObject) {
+        this.mInnerVertices = new ArrayList<Vertex>();
+        this.commonInitialization(gameObject);
+        this.initInnerVertices(defaultOffset, defaultOffset);
+    }
+
+
+    /**
+     * @param gameObject
+     */
+    private void commonInitialization(GameObject gameObject) {
+        //par défaut la box n'est pas visible
+        this.setVisibility(false);
+
+        //On mémorise la référence du gameObject "parent"
+        this.setGameObject(gameObject);
+
+    }
+
+    /**
+     * @param offsetX
+     * @param offsetY
+     */
+    private void initInnerVertices(float offsetX, float offsetY) {
+        //Aller rechercher les points limite de la forme et en déduire
+        //un rectangle avec un retrait "offset"
         float xread = 0f;
         float yread = 0f;
         float xmin = 0f;
@@ -61,15 +122,15 @@ public class CollisionBox extends Rectangle2D {
 
         // pour chaque vertex composant la forme, on va en déterminer les
         // limites pour fabriquer une boite de colision
-        for (int i = 0; i < this.parent.getVertices().size(); i++) {
+        for (int i = 0; i < this.getGameObject().getVertices().size(); i++) {
 
             // lecture du X
-            xread = this.parent.getVertices().get(i).x;
+            xread = this.getGameObject().getVertices().get(i).x;
             xmin = (xread < xmin) ? xread : xmin;
             xmax = (xread > xmax) ? xread : xmax;
 
             // lecture du Y
-            yread = this.parent.getVertices().get(i).y;
+            yread = this.getGameObject().getVertices().get(i).y;
             ymin = (yread < ymin) ? yread : ymin;
             ymax = (yread > ymax) ? yread : ymax;
 
@@ -85,86 +146,56 @@ public class CollisionBox extends Rectangle2D {
         ymin += offsetY;
         ymax += -offsetY;
 
-        this.mWorldVertices.clear();
 
-        this.mWorldVertices.add(new Vertex(xmin, ymax, 0));
+        //on ajoute les vertex du rectangle
+        this.getInnerVertices().add(new Vertex(xmin, ymax, 0));
+        this.getInnerVertices().add(new Vertex(xmin, ymin, 0));
+        this.getInnerVertices().add(new Vertex(xmax, ymin, 0));
+        this.getInnerVertices().add(new Vertex(xmax, ymax, 0));
 
-        this.mWorldVertices.add(new Vertex(xmin, ymin, 0));
+    }
 
-        this.mWorldVertices.add(new Vertex(xmax, ymin, 0));
 
-        this.mWorldVertices.add(new Vertex(xmax, ymax, 0));
+    public void updateWorldVertices() {
 
         // on redéfinit les coordonées des vertices
         // pour avoir les coordonnées transformées
+        this.mWorldVertices = Tools.applyModelView(this.mInnerVertices, this.getGameObject().mModelView);
 
-        mWorldVertices = this.applyModelView(this.parent.mModelView);
-
-        this.setCoord(this.parent.X, this.parent.Y);
 
     }
 
     /**
-     *
      * @param Mvp
      */
-    public void draw(float[] Mvp) {
+    public void draw(ProgramShaderManager PSM, float[] Mvp) {
 
-        ProgramShaderManager PSM = this.getScene().getPSManager();
         ProgramShader sh = PSM.getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
         PSM.use(sh);
-
-        // on se positionne au debut du Buffer des indices
-        // qui indiquent dans quel ordre les vertex doivent étre dessinés
-        this.getIndices().position(0);
-
-        // on charge les coordon�es de texture
-//        sh.setTextureCoord(this.getTextCoord());
-
-//		 if (sh.attrib_color_location != -1) {
-        // this.getVertices().position(0);
-        float[] color = new float[4];
-        color[0] = 1.f;
-        color[1] = 1.f;
-        color[2] = 1.f;
-        color[3] = 1.f;
-
-        FloatBuffer toto = ByteBuffer.allocateDirect(4 * FLOAT_SIZE)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        toto.put(color);
-
-
-        GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
-                GLES20.GL_FLOAT, false, Vertex.Vertex_TEXT_SIZE_BYTES, toto);
 
         sh.enableShaderVar();
 
         // on charge les coordonnées des vertices
-        //sh.setVerticesCoord(this.getFbVertices());
-        //this.mFbVertices.clear();
-        /*
-        for (int i = 0; i < this.mWorldVertices.size(); i++) {
 
-            this.putXYZIntoFbVertices(i, this.mWorldVertices.get(i));
+        FloatBuffer fbVertices = ByteBuffer.allocateDirect(4 * 3 * CONST.FLOAT_SIZE)
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+        for (int i = 0; i < this.mWorldVertices.size(); i++) {
+            Tools.putXYZIntoFbVertices(fbVertices, i, this.mWorldVertices.get(i));
         }
-        sh.setVerticesCoord(this.mFbVertices);
-*/
+        sh.setVerticesCoord(fbVertices);
+
         // on alimente la donnée UNIFORM mAdressOf_Mvp du programme OpenGL
         // avec
         // une matrice de 4 flotant.
         GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, Mvp, 0);
 
-        // on se positionne au debut du Buffer des indices
+        // on récupère les indices du rectangle vide
         // qui indiquent dans quel ordre les vertex doivent être dessinés
-        this.getIndices().rewind();
 
-        GLES20.glDrawElements(this.drawMode, this.getIndices().capacity(),
-                GLES20.GL_UNSIGNED_SHORT, this.getIndices());
-
-        // renderer.mProgramme1.disableVertexAttribArray();
-        // �quivalent du POP
-        // / renderer.mModelView = this.mBackupModelView;
-        // renderer.mProgramme1.disableVertexAttribArray();
+        ShortBuffer indices = Rectangle2D.getIndicesForEmptyRec();
+        GLES20.glDrawElements(GLES20.GL_LINES, indices.capacity(),
+                GLES20.GL_UNSIGNED_SHORT, indices);
 
     }
 

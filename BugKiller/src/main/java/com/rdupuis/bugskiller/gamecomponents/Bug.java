@@ -53,7 +53,7 @@ public class Bug extends Rectangle2D {
         this.setTexture(texture_alive);
 
         //si on souhaite activer la gestion des collisions
-        this.enableColision();
+        //this.enableColision();
         this.isStatic = false;
         this.setTagName("bug");
         this.textureEnabled = true;

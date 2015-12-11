@@ -18,6 +18,7 @@ import java.util.ArrayList;
  */
 public class GameObjectManager {
 
+    private int idSequenceNumber;
     private Scene mScene;
     private ArrayList<GameObject> mGameObjectList;
     public int[] vbo;
@@ -35,7 +36,11 @@ public class GameObjectManager {
     }
 
     public GameObjectManager(Scene scene) {
+
+        //mémoriser le lien ave la scène
         this.setScene(scene);
+
+        //initialisation d'une liste d'objets vide
         this.mGameObjectList = new ArrayList<GameObject>();
     }
 
@@ -49,10 +54,6 @@ public class GameObjectManager {
 
     public void remove(GameObject gameObject) {
         this.mGameObjectList.remove(gameObject);
-    }
-
-    public void addAll(ArrayList<GameObject> gameObjectList) {
-        this.mGameObjectList.remove(gameObjectList);
     }
 
 

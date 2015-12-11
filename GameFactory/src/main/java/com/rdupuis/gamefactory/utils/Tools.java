@@ -1,9 +1,14 @@
 package com.rdupuis.gamefactory.utils;
 
 import android.content.Context;
+import android.opengl.Matrix;
+
+import com.rdupuis.gamefactory.components.Vertex;
+
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 
 public class Tools {
@@ -41,7 +46,54 @@ public class Tools {
 		return value;
 	}
 
-	
-	
+    public static void putXYZIntoFbVertices(FloatBuffer fbVertices,int index, Vertex vertex) {
+    // la position physique en mémoire des bytes qui représentent le vertex
+    // c'est la taille d'un vertex en bytes x l'index
+    fbVertices.rewind();
+    // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
+    // prochain vertex
+    fbVertices.position(Vertex.Vertex_COORD_SIZE * index);
+    fbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
+    // on se repositionne en 0 , prêt pour la relecture
+    fbVertices.rewind();
+
+    }
+
+    /**
+     * Cette fonction permet de récupérer les coordonées de vertex à l'écran
+     * en multipliant le vertex par la matrice MVP
+     *
+     * @param modelView
+     * @return
+     */
+    public static ArrayList<Vertex> applyModelView(ArrayList<Vertex> vertices,float[] modelView) {
+
+        // on récupère les vertices de l'objet
+        // et on calcule leur coordonées dans le monde
+        float[] oldVerticesCoord = new float[4];
+        float[] newVerticesCoord = new float[4];
+
+        // définition d'un tableau de flotants
+        ArrayList<Vertex> mModelViewVertices = new ArrayList<Vertex>();
+
+        // je suis obligé de passer par un vecteur 4 pour la multiplication
+
+        for (int i = 0; i < vertices.size(); i++) {
+            oldVerticesCoord[0] = vertices.get(i).x; // x
+            oldVerticesCoord[1] = vertices.get(i).y; // y
+            oldVerticesCoord[2] = vertices.get(i).z; // z
+            oldVerticesCoord[3] = 1.f;
+
+            Matrix.multiplyMV(newVerticesCoord, 0, modelView, 0,
+                    oldVerticesCoord, 0);
+            mModelViewVertices.add(new Vertex(newVerticesCoord[0],
+                    newVerticesCoord[1], newVerticesCoord[2]));
+
+        }
+
+        return mModelViewVertices;
+
+    }
+
 
 }

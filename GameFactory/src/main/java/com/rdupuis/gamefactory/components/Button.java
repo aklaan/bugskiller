@@ -45,7 +45,6 @@ public class Button extends Rectangle2D implements Clikable {
         this.textureEnabled = true;
     }
 
-
     public void addGLButtonListener(GLButtonListener glButtonListener) {
         this.eventListenerList.add(glButtonListener);
     }
@@ -56,7 +55,9 @@ public class Button extends Rectangle2D implements Clikable {
       //  Log.e("button", "on update");
         if (SystemClock.elapsedRealtime() - this.lastTap != DELAY_BTWN_TAP) {
 
-            if (this.isCollideWith(this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG))) {
+            GameObject uf = this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG);
+
+            if (this.getScene().getColliderManager().isCollide(this,uf)) {
         //        Log.e("button", "set texture down");
                 this.setTexture(this.textureDown);
                 this.status = ButtonStatus.DOWN;
@@ -70,7 +71,9 @@ public class Button extends Rectangle2D implements Clikable {
                     this.listening = true;
                 } else {
 
-                    // si je suis en train d'écouter, l'incrémente le compteur
+                    // si je suis en train d'écouter, l'incrémente le compteur de temps
+                    // pour avoir une idée du temp laissé appuyé sur le bouton
+                    //ceci pour detecter les longClick
                     this.elapsedTime = SystemClock.elapsedRealtime() - this.lastTap;
                 }
 
@@ -117,7 +120,10 @@ public class Button extends Rectangle2D implements Clikable {
 
     }
 
-
+    /**
+     * pour tous les objets qui écoutent le onClick(), on leur passe
+     * l'info
+     */
     public void onClick() {
         for (GLButtonListener listener : eventListenerList) {
             listener.onClick();

@@ -52,13 +52,13 @@ public class Scene01 extends Scene {
         //this.addToScene(background);
 
         //BUG
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < 50; i++) {
             Bug bug = new Bug(this.getTexManager().getTextureById(R.string.spaceship),
                     this.getTexManager().getTextureById(R.string.bugdead));
             bug.setWidth(30);
             bug.setHeight(30);
-            bug.setCoord((float) (this.getWidth() / 2) +  35*i,
-                    (float) (this.getHeight() / 2) +  35*i);
+            bug.setCoord((float) (this.getWidth() / 2) +  5*i,
+                    (float) (this.getHeight() / 2) +  5*i);
             bug.setTagName(TAG_BUG);
 
             //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
@@ -72,7 +72,6 @@ public class Scene01 extends Scene {
                 this.getTexManager().getTextureById(R.string.bugdead));
         button.setTagName(TAG_BUTTON);
         button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
-        button.mCollisionBox.isVisible = true;
         this.addToScene(button);
 
         GLButtonListener toto = new GLButtonListener() {

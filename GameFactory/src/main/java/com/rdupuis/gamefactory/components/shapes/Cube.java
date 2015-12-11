@@ -114,10 +114,7 @@ public class Cube extends Shape {
 
 	public void setHeight(float h) {
 		this.hight = h;
-		updateVertices();
-		if (this.canCollide) {
-			this.mCollisionBox.update();
-		}
+
 	}
 
 	public float getHeight() {
@@ -130,10 +127,7 @@ public class Cube extends Shape {
 
 	public void setWidth(float w) {
 		this.width = w;
-		updateVertices();
-		if (this.canCollide) {
-			this.mCollisionBox.update();
-		}
+
 	}
 
 	
@@ -143,56 +137,12 @@ public class Cube extends Shape {
 
 	public void setDepth(float d) {
 		this.depth = d;
-		updateVertices();
-		if (this.canCollide) {
-			this.mCollisionBox.update();
-		}
+
 	}
 
 	
 	
-	private void updateVertices() {
 
-		// comme le 0,0 est au milieu on divise par 2
-		float w = (float) width / 2;
-		float h = (float) hight / 2;
-		float d = (float) depth / 2;
-		/*
-		this.mVertices.get(0).x = -w;
-		this.mVertices.get(0).y = h;
-		this.mVertices.get(0).z = -d;
-		
-		this.mVertices.get(1).x = -w;
-		this.mVertices.get(1).y = -h;
-		this.mVertices.get(1).z = -d;
-		
-		this.mVertices.get(2).x = w;
-		this.mVertices.get(2).y = -h;
-		this.mVertices.get(2).z = -d;
-		
-		this.mVertices.get(3).x = w;
-		this.mVertices.get(3).y = h;
-		this.mVertices.get(3).z = -d;
-
-		this.mVertices.get(4).x = -w;
-		this.mVertices.get(4).y = h;
-		this.mVertices.get(4).z = d;
-
-		this.mVertices.get(5).x = -w;
-		this.mVertices.get(5).y = -h;
-		this.mVertices.get(5).z = d;
-		
-		this.mVertices.get(6).x = w;
-		this.mVertices.get(6).y = -h;
-		this.mVertices.get(6).z = d;
-		
-		this.mVertices.get(7).x = w;
-		this.mVertices.get(7).y = h;
-		this.mVertices.get(7).z = d;
-
-	*/
-	
-	}
 
 
 }

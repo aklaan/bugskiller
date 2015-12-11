@@ -20,7 +20,7 @@ public class UserFinger extends Rectangle2D {
         this.setHeight(50);
         this.setWidth(50);
         this.enableColision();
-        this.mCollisionBox.isVisible = false;
+
         this.setTagName(USER_FINGER_TAG);
         this.isStatic = false;
         // on fait exprès de définir le premier point loin de l'écran
