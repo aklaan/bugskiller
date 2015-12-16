@@ -104,7 +104,7 @@ public class Cube extends Shape {
 	}
 
 	@Override
-	public void onUpdate() {
+	public void update() {
 		// TODO Auto-generated method stub
 //this.angleRADY += 0.5f;
 //this.angleRADX+= 0.5f;

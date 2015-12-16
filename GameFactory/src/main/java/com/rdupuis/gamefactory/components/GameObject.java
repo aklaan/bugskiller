@@ -20,26 +20,10 @@ import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class GameObject implements  Cloneable {
+public class GameObject extends AbstractGameObject implements Cloneable {
 
     //Id du buffer Gl où se trouvent les vertex
     private int glVBoId;
-
-    public int getNbvertex() {
-        return nbvertex;
-    }
-
-    public void setNbvertex(int nbvertex) {
-        this.nbvertex = nbvertex;
-    }
-
-    public int getNbIndex() {
-        return nbIndex;
-    }
-
-    public void setNbIndex(int nbIndex) {
-        this.nbIndex = nbIndex;
-    }
 
     //nombre de vertex
     private int nbvertex;
@@ -55,6 +39,14 @@ public class GameObject implements  Cloneable {
 
     //Actuelle texture utilisé pour rendre l'objet
     private Texture mTexture;
+
+    public Boolean isTextureEnabled() {
+        return textureEnabled;
+    }
+
+    public void setTextureActivation(Boolean textureEnabled) {
+        this.textureEnabled = textureEnabled;
+    }
 
     //Top pour activer/désactiver le rendu des textures
     public Boolean textureEnabled;
@@ -84,41 +76,6 @@ public class GameObject implements  Cloneable {
     //Taille de l'objet
     private float width;
 
-    /**
-     * @return
-     */
-    public int getGlVBoId() {
-        return glVBoId;
-    }
-
-    public void setGlVBoId(int glVBoId) {
-        this.glVBoId = glVBoId;
-    }
-
-    public int getGlVBiId() {
-        return glVBiId;
-    }
-
-    public void setGlVBiId(int glVBiId) {
-        this.glVBiId = glVBiId;
-    }
-
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
 
     private float height;
 
@@ -180,206 +137,67 @@ public class GameObject implements  Cloneable {
     private FloatBuffer mTextCoord;
 
 
-    /**********************************************************************
+
+    /******************************************************************
      * getter & setter
-     **********************************************************************/
+     ****************************************************************/
 
-    /**
-     * Constructeur
-     */
-    public GameObject() {
-
-        //Initalisation des Valeurs par défaut :
-        //l'Alpha ambiant est à 100%
-        this.setAlpha(1);
-
-        //taille par défaut
-        this.width = 1;
-        this.height = 1;
-
-        //pas de rendu des texture par défaut
-        this.textureEnabled = false;
-
-        //pas de tagname
-        mTagName = "";
-
-        //visible par défaut
-        isVisible = true;
-
-        //TODO : cette liste doit être géré par le manager et non dans l'objet
-        this.mCollideWithList = new ArrayList<GameObject>();
-
-        this.mGameObjectToListenList = new ArrayList<GameObject>();
-
-
+    public int getNbvertex() {
+        return nbvertex;
     }
 
-    //cette fonction est à overrider par les GameObject
-    public ArrayList<Vertex> getVertices() {
-        ArrayList<Vertex> result = new ArrayList<Vertex>();
-        return result;
+    public void setNbvertex(int nbvertex) {
+        this.nbvertex = nbvertex;
     }
 
-    public Texture getTexture() {
-        return mTexture;
+    public int getNbIndex() {
+        return nbIndex;
     }
 
-    public void setTexture(Texture mTexture) {
-        this.mTexture = mTexture;
+    public void setNbIndex(int nbIndex) {
+        this.nbIndex = nbIndex;
     }
 
-    public void setScene(Scene mScene) {
-        this.mScene = mScene;
+    public int getGlVBoId() {
+        return glVBoId;
     }
 
-
-    /**
-     * @return
-     */
-    public ArrayList<GameObject> getGameObjectToListenList() {
-        return this.mGameObjectToListenList;
+    public void setGlVBoId(int glVBoId) {
+        this.glVBoId = glVBoId;
     }
 
-    /**
-     * Activer la gestion des colisions
-     */
-    public void enableColision() {
-        this.canCollide = true;
+    public int getGlVBiId() {
+        return glVBiId;
     }
 
-    /**
-     * désactiver la gestion des colisions
-     */
-    public void disableColision() {
-         this.canCollide = false;
-        //TODO : cette liste doit être géré par le manager et non dans l'objet
-
+    public void setGlVBiId(int glVBiId) {
+        this.glVBiId = glVBiId;
     }
 
-
-    /**
-     * alimenter un buffer avec des coordonées de vertex
-     *
-     * @param index
-     * @param vertex
-     */
-    //public void putXYZIntoFbVertices(int index, Vertex vertex) {
-    // la position physique en mémoire des bytes qui représentent le vertex
-    // c'est la taille d'un vertex en bytes x l'index
-    //mFbVertices.rewind();
-    // ici on se positionne dans le buffer à l'endroit ou l'on va ecrire le
-    // prochain vertex
-    //mFbVertices.position(Vertex.Vertex_COORD_SIZE * index);
-    //mFbVertices.put(vertex.x).put(vertex.y).put(vertex.z);
-    // on se repositionne en 0 , prêt pour la relecture
-    //mFbVertices.rewind();
-
-    //}
-
-
-    /**
-     * insérer des bytes "u,v" dans le buffer des coordonnées de texture
-     *
-     * @param index
-     * @param vertex
-     */
-    public void putUVIntoFbTextCoord(int index, Vertex vertex) {
-        //on se place au debut du buffer
-        mTextCoord.rewind();
-        //on avance dans le buffer à l'endroit où on souhaite écrire
-        mTextCoord.position(Vertex.Vertex_TEXT_SIZE * index);
-        //on écrit les coordonées de texture
-        mTextCoord.put(vertex.u).put(vertex.v);
-        // on se repositionne en 0 , prêt pour la lecture
-        mTextCoord.rewind();
+    public float getHeight() {
+        return height;
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param anglRAD
-     */
-    public void rotate(float x, float y, float anglRAD) {
-
-        X = X + (float) (Math.cos(anglRAD));
-        Y = Y + (float) (Math.sin(anglRAD));
-        // Matrix.translateM(wrkresult, 0, x, y, 0);
-        Log.i("debug", String.valueOf(X) + " / " + String.valueOf(Y));
-
-        Log.i("debug", String.valueOf(Math.cos(anglRAD)));
-
+    public void setHeight(float height) {
+        this.height = height;
     }
 
-    // setter indices
-    /*
-    public void putIndice(int index, int indice) {
-        // on se positionne a l'index dans le buffer
-        // comme on a qu'un seul short a placer on ne fait pas comme dans
-        // putvertice
-        mIndices.position(index);
-        // on ecrit le short
-        mIndices.put((short) indice);
-        // on se repositionne en z�ro
-        mIndices.position(0);
+    public float getWidth() {
+        return width;
     }
-*/
 
-    /**
-     * @return
-     */
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
     public Scene getScene() {
         return this.mScene;
-    }
-
-    /**
-     * @return
-     */
-    /*
-    public FloatBuffer getFbVertices() {
-
-        for (int i = 0; i < this.mVertices.size(); i++) {
-            this.putXYZIntoFbVertices(i, this.mVertices.get(i));
-        }
-
-        return mFbVertices;
-    }
-*/
-
-    /**
-     * @return
-     */
-    public FloatBuffer getFbTextCood() {
-
-        for (int i = 0; i < this.getNbvertex(); i++) {
-            this.putUVIntoFbTextCoord(i, this.getVertices().get(i));
-        }
-
-        return mTextCoord;
-    }
-
-
-    // getter TextCoord
-    public FloatBuffer getTextCoord() {
-        return mTextCoord;
-    }
-
-    // getter indices
-    public ShortBuffer getIndices() {
-        return null;
-    }
-
-
-    public void onUpdate() {
-
     }
 
     public String getTagName() {
         return mTagName;
     }
 
-    /**
-     * @param tagid
-     */
     public void setTagName(int tagid) {
         mTagName = String.valueOf(tagid);
     }
@@ -424,11 +242,174 @@ public class GameObject implements  Cloneable {
     }
 
     /**
+     * @return
+     */
+    public ArrayList<GameObject> getGameObjectToListenList() {
+        return this.mGameObjectToListenList;
+    }
+
+    /********************************************************************
+     * Constructeur
+     *******************************************************************/
+    public GameObject() {
+
+        //Initalisation des Valeurs par défaut :
+        //l'Alpha ambiant est à 100%
+        this.setAlpha(1);
+
+        //taille par défaut
+        this.width = 1;
+        this.height = 1;
+
+        //pas de rendu des texture par défaut
+        this.textureEnabled = false;
+
+        //pas de tagname
+        mTagName = "";
+
+        //visible par défaut
+        isVisible = true;
+
+        //TODO : cette liste doit être géré par le manager et non dans l'objet
+        this.mCollideWithList = new ArrayList<GameObject>();
+
+        this.mGameObjectToListenList = new ArrayList<GameObject>();
+
+
+    }
+
+    //cette fonction est à overrider par les GameObject
+    @Override
+    public ArrayList<Vertex> getVertices() {
+        ArrayList<Vertex> result = new ArrayList<Vertex>();
+        return result;
+    }
+
+    public Texture getTexture() {
+        return mTexture;
+    }
+
+    public void setTexture(Texture mTexture) {
+        this.mTexture = mTexture;
+    }
+
+    public void setScene(Scene mScene) {
+        this.mScene = mScene;
+    }
+
+
+
+    /**
+     * Activer la gestion des colisions
+     */
+    public void enableColision() {
+        this.canCollide = true;
+    }
+
+    /**
+     * désactiver la gestion des colisions
+     */
+    public void disableColision() {
+        this.canCollide = false;
+        //TODO : cette liste doit être géré par le manager et non dans l'objet
+
+    }
+
+
+    /**
+     * insérer des bytes "u,v" dans le buffer des coordonnées de texture
+     *
+     * @param index
+     * @param vertex
+     */
+    public void putUVIntoFbTextCoord(int index, Vertex vertex) {
+        //on se place au debut du buffer
+        mTextCoord.rewind();
+        //on avance dans le buffer à l'endroit où on souhaite écrire
+        mTextCoord.position(Vertex.Vertex_TEXT_SIZE * index);
+        //on écrit les coordonées de texture
+        mTextCoord.put(vertex.u).put(vertex.v);
+        // on se repositionne en 0 , prêt pour la lecture
+        mTextCoord.rewind();
+    }
+
+    /**
+     * @param x
+     * @param y
+     * @param anglRAD
+     */
+    public void rotate(float x, float y, float anglRAD) {
+
+        X = X + (float) (Math.cos(anglRAD));
+        Y = Y + (float) (Math.sin(anglRAD));
+        // Matrix.translateM(wrkresult, 0, x, y, 0);
+        Log.i("debug", String.valueOf(X) + " / " + String.valueOf(Y));
+
+        Log.i("debug", String.valueOf(Math.cos(anglRAD)));
+
+    }
+
+
+    /**
+     * @return
+     */
+
+    /**
+     * @return
+     */
+    /*
+    public FloatBuffer getFbVertices() {
+
+        for (int i = 0; i < this.mVertices.size(); i++) {
+            this.putXYZIntoFbVertices(i, this.mVertices.get(i));
+        }
+
+        return mFbVertices;
+    }
+*/
+
+    /**
+     * @return
+     */
+    public FloatBuffer getFbTextCood() {
+
+        for (int i = 0; i < this.getNbvertex(); i++) {
+            this.putUVIntoFbTextCoord(i, this.getVertices().get(i));
+        }
+
+        return mTextCoord;
+    }
+
+
+    // getter TextCoord
+    public FloatBuffer getTextCoord() {
+        return mTextCoord;
+    }
+
+    // getter indices
+    public ShortBuffer getIndices() {
+        return null;
+    }
+
+
+    /**
+     * getter & setter
+     *
+     * @return
+     */
+
+    @Override
+    public void update() {
+
+    }
+
+
+    /**
      * Dessiner l'objet
      */
-    public void draw(Scene scene) {
+    public void draw_Old() {
 
-        ProgramShaderManager PSM = scene.getPSManager();
+        ProgramShaderManager PSM = this.getScene().getPSManager();
         // j'utilise le shader prévu
         ProgramShader sh = PSM.getShaderByName("simple");
         PSM.use(sh);
@@ -439,13 +420,15 @@ public class GameObject implements  Cloneable {
             //on active l'unité de traitement des textures 0
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 
-            // on demande à opengl d'utiliser la texture
+            // on demande à opengl d'utiliser la texture chargé en mémoire graphique
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
-            //on fait pointer  uniform_texture_location sur le buffer où est la texture
+
+            //on assigne la texture à l'unité de traitement zéro
             GLES20.glUniform1i(sh.uniform_texture_location, 0);
 
             //initialisation du buffer des coodonnées de texture
             getFbTextCood();
+
             //Chargement des coodonées de texture
             sh.setTextureCoord(getTextCoord());
 
@@ -487,7 +470,7 @@ public class GameObject implements  Cloneable {
          Vertex_COORD_SIZE = 3;
          */
         //--------------------------------------------
-        sh.enableShaderVar();
+        sh.enableAttribs();
 
 
         //Calcul de la matrice model-view-projection
@@ -538,7 +521,7 @@ public class GameObject implements  Cloneable {
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-        sh.disableShaderVar();
+        sh.disableAttribs();
         // renderer.mProgramme1.disableVertexAttribArray();
         // �quivalent du POP
         // renderer.mModelView = this.mBackupModelView;
@@ -551,12 +534,8 @@ public class GameObject implements  Cloneable {
      *
      */
 
-    public void drawWithStride(float[] projectionMatrix) {
-        // j'utilise le shader prévu
-        //TODO on pourrais faire une fonction dans le PSManage pour faire cette action
-        //TODO ici il n'y aurrait qu'à appeler le shader par son nom
-        ProgramShader sh = this.getScene().getPSManager().getShaderByName("simple");
-        this.getScene().getPSManager().use(sh);
+    public void draw() {
+        ProgramShader shader = this.getScene().getPSManager().getCurrentActiveShader();
 
         //si l'utilisation d'une texture est active on l'utilise
         if (this.textureEnabled) {
@@ -568,7 +547,7 @@ public class GameObject implements  Cloneable {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, this.getTexture().getGlBufferId());
 
             //on fait pointer  uniform_texture_location sur le buffer où est la texture
-            GLES20.glUniform1i(sh.uniform_texture_location, 0);
+            GLES20.glUniform1i(shader.uniform_texture_location, 0);
         }
 
         /********************************************************************************
@@ -596,22 +575,21 @@ public class GameObject implements  Cloneable {
         // se positionner pour aller chercher les valeurs contenue dans la mémoire graphique
         // ici on commence à lire le buffer à partir de la position zéro et on fait des saut
         // de "stride=5" pour passer aux coordonnées suivantes
-        GLES20.glVertexAttribPointer(sh.attrib_vertex_coord_location, Vertex.Vertex_COORD_SIZE,
+        GLES20.glVertexAttribPointer(shader.attrib_vertex_coord_location, Vertex.Vertex_COORD_SIZE,
                 GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, 0);
 
         //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
         // ensuite on fait des saut pour lire les suivantes
-        GLES20.glVertexAttribPointer(sh.attrib_texture_coord_location, Vertex.Vertex_TEXT_SIZE,
+        GLES20.glVertexAttribPointer(shader.attrib_texture_coord_location, Vertex.Vertex_TEXT_SIZE,
                 GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, Vertex.Vertex_COORD_SIZE * Vertex.FLOAT_SIZE);
 
         //ici on commence la lecture des coordonées de texture juste après les premier x,y,z
         // ensuite on fait des saut pour lire les suivantes
-        GLES20.glVertexAttribPointer(sh.attrib_color_location, Vertex.Vertex_COLOR_SIZE,
+        GLES20.glVertexAttribPointer(shader.attrib_color_location, Vertex.Vertex_COLOR_SIZE,
                 GLES20.GL_FLOAT, false, Vertex.stride * Vertex.FLOAT_SIZE, (Vertex.Vertex_COORD_SIZE + Vertex.Vertex_TEXT_SIZE) * Vertex.FLOAT_SIZE);
 
         //--------------------------------------------
-        sh.enableShaderVar();
-
+        shader.enableAttribs();
 
         //Calcul de la matrice model-view-projection
         float[] mMvp = new float[16];
@@ -626,10 +604,10 @@ public class GameObject implements  Cloneable {
 
         // On alimente la donnée UNIFORM mAdressOf_Mvp du programme OpenGL
         // avec une matrice de 4 flotant.
-        GLES20.glUniformMatrix4fv(sh.uniform_mvp_location, 1, false, mMvp, 0);
+        GLES20.glUniformMatrix4fv(shader.uniform_mvp_location, 1, false, mMvp, 0);
 
         //on alimente la donnée Alpha
-        GLES20.glUniform1f(sh.uniform_alpha_location, this.getAlpha());
+        GLES20.glUniform1f(shader.uniform_alpha_location, this.getAlpha());
 
         //je me place sur le buffer des index
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, this.getGlVBiId());
@@ -651,67 +629,31 @@ public class GameObject implements  Cloneable {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
 
-
-
-
     }
 
 
-    /**
-     * Mise à jour de la ModelView pour prendre en compte les
-     * modification apportées à l'ojet
-     * taille - position - rotation
-     * <p/>
-     * /!\ l'ordre où on applique les transformation et hyper important
-     * il faut toujours faire : translation*rotation*scale
-     */
-
-    public void updateModelView() {
-        float[] wrkRotationMatrix = new float[16];
-        float[] modelView = new float[16];
-
-        //on initialise une matrice identitaire
-        Matrix.setIdentityM(modelView, 0);
-
-        //on fabrique une matrice de déplacement vers les coordonnées x,y,z
-        Matrix.translateM(modelView, 0, this.X, this.Y, this.Z);
-
-        //on fabrique une matrice de rotation
-        Matrix.setRotateEulerM(wrkRotationMatrix, 0, this.angleRADX,
-                this.angleRADY, this.angleRADZ);
-
-        //Calcul de la matrice ModelView
-        Matrix.multiplyMM(this.mModelView, 0, modelView, 0,
-                wrkRotationMatrix, 0);
-
-        //Scales matrix m in place by sx, sy, and sz.
-        Matrix.scaleM(this.mModelView, 0, this.getWidth(), this.getHeight(), 0.f);
-
-    }
 
     /**
      * Fonction de mise à jour générale
      */
 
-    public void mainUpdate() {
+    public void mainUpdate_old() {
 
         // traiter les opérations diverses à effectuer lors de
         // la mise à jour
-        this.onUpdate();
+  //      this.update();
 
 
         // A la fin des mises à jour on connais les nouvelles coordonées
         // on peut calculer la nouvelle matrice modelView
-        this.updateModelView();
+//        this.updateModelView();
 
-             // -----------------------------------------------------
+        // -----------------------------------------------------
         // Traiter les évènements écoutés sur les autres objets
         // -----------------------------------------------------
-        updateListerners();
+//        updateListerners();
 
     }
-
-
 
 
     /********************************************************

@@ -173,7 +173,7 @@ public class CollisionBox {
         ProgramShader sh = PSM.getShaderByName(ProgramShader_forLines.SHADER_FOR_LINES);
         PSM.use(sh);
 
-        sh.enableShaderVar();
+        sh.enableAttribs();
 
         // on charge les coordonnées des vertices
 

@@ -88,7 +88,7 @@ public class ProgramShader_grille extends ProgramShader {
 	 *             sinon on obtient un ecran noir !	
 	 */
 	@Override
-	public void enableShaderVar() {
+	public void enableAttribs() {
 		GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
 		// GLES20.glEnableVertexAttribArray(this.attrib_color_location);
 		GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
@@ -103,7 +103,7 @@ public class ProgramShader_grille extends ProgramShader {
 	 * Désactivation des attributs propres au Shader
 	 */
 	@Override
-	public void disableShaderVar() {
+	public void disableAttribs() {
 		GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
 		GLES20.glDisableVertexAttribArray(this.attrib_color_location);
 		GLES20.glDisableVertexAttribArray(this.attrib_texture_coord_location);

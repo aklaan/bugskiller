@@ -11,12 +11,14 @@ import com.rdupuis.bugskiller.gamecomponents.Bug;
 import com.rdupuis.gamefactory.animations.AnimationFadeOut;
 import com.rdupuis.gamefactory.animations.AnimationRotate;
 import com.rdupuis.gamefactory.components.Button;
+import com.rdupuis.gamefactory.components.ButtonB;
 import com.rdupuis.gamefactory.components.GLButtonListener;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.OpenGLActivity;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
+import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
 import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
 
@@ -48,7 +50,7 @@ public class Scene01 extends Scene {
 
 
         //   this.getBitmapProvider().linkTexture(R.string.mountains, background);
-//        this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
+        //   this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
         //this.addToScene(background);
 
         //BUG
@@ -57,8 +59,8 @@ public class Scene01 extends Scene {
                     this.getTexManager().getTextureById(R.string.bugdead));
             bug.setWidth(30);
             bug.setHeight(30);
-            bug.setCoord((float) (this.getWidth() / 2) +  5*i,
-                    (float) (this.getHeight() / 2) +  5*i);
+            bug.setCoord((float) (this.getWidth() / 2) + 5 * i,
+                    (float) (this.getHeight() / 2) + 5 * i);
             bug.setTagName(TAG_BUG);
 
             //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
@@ -68,9 +70,10 @@ public class Scene01 extends Scene {
         //BUTTON
         //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
-        button = new Button(450, 150, 200, 100, this.getTexManager().getTextureById(R.string.circle),
-                this.getTexManager().getTextureById(R.string.bugdead));
+        button = new Button(450, 150, 200, 200, this.getTexManager().getTextureById(R.string.circle),
+                this.getTexManager().getTextureById(R.string.circle));
         button.setTagName(TAG_BUTTON);
+        //on place le bouton au centre de la vue
         button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
         this.addToScene(button);
 
@@ -94,6 +97,20 @@ public class Scene01 extends Scene {
         };
 
         button.addGLButtonListener(toto);
+
+
+        //BUTTON
+        //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
+        ButtonB buttonb;
+        buttonb = new ButtonB(450, 150, 500, 500, this.getTexManager().getTextureById(R.string.emptycircle),
+                this.getTexManager().getTextureById(R.string.emptycircle));
+        buttonb.setTagName(TAG_BUTTON);
+        //on place le bouton au centre de la vue
+        buttonb.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
+        this.addToScene(buttonb);
+
+
+
     }
 
 
@@ -101,8 +118,12 @@ public class Scene01 extends Scene {
     public void loadProgramShader() {
         this.getPSManager().catalogShader.clear();
         this.getPSManager().shaderList.clear();
-        this.getPSManager().add(new ProgramShader_simple());
+        ProgramShader ps = new ProgramShader_simple();
+        this.getPSManager().add(ps);
         this.getPSManager().add(new ProgramShader_forLines());
+
+        //on défini le simple comme shader par defaut.
+        this.getPSManager().setDefaultSader(ps);
     }
 
     @Override
@@ -112,7 +133,7 @@ public class Scene01 extends Scene {
         this.getTexManager().add(R.string.bugdead);
         this.getTexManager().add(R.string.circle);
         this.getTexManager().add(R.string.spaceship);
-
+        this.getTexManager().add(R.string.emptycircle);
     }
 
 

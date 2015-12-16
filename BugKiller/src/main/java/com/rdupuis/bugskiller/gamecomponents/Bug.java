@@ -64,7 +64,7 @@ public class Bug extends Rectangle2D {
     }
 
     @Override
-    public void onUpdate() {
+    public void update() {
 
         if (this.isAlive()) {
 

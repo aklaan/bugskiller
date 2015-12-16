@@ -79,7 +79,7 @@ public class ProgramShader_forLines extends ProgramShader {
     // Attention : il ne faut pas rendre enable un attribut non valoris�
     // sinon c'est ecran noir !
     @Override
-    public void enableShaderVar() {
+    public void enableAttribs() {
         GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glEnableVertexAttribArray(this.attrib_color_location);
 
@@ -87,7 +87,7 @@ public class ProgramShader_forLines extends ProgramShader {
 
     // **************************************************************************
     @Override
-    public void disableShaderVar() {
+    public void disableAttribs() {
         GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glDisableVertexAttribArray(this.attrib_color_location);
         GLES20.glDisableVertexAttribArray(this.uniform_mvp_location);

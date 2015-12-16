@@ -13,8 +13,8 @@ public class ProgramShader_simple extends ProgramShader {
 
     // déclaration des uniforms spécifiques au shader
     public final String VSH_UNIFORM_MVP = "uMvp";
-    public final String FSH_UNIFORM_TEXTURE = "tex0";
-    public final String FSH_UNIFORM_ALPHA = "aAlpha";
+    public final String FSH_UNIFORM_TEXTURE = "uTex0";
+    public final String FSH_UNIFORM_ALPHA = "uAlpha";
 
     public ProgramShader_simple() {
         super();
@@ -121,7 +121,8 @@ public class ProgramShader_simple extends ProgramShader {
     // *******************************************************************
     // Attention : il ne faut pas rendre enable un attribut non valorisé
     // sinon c'est ecran noir !
-    public void enableShaderVar() {
+    @Override
+    public void enableAttribs() {
         GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glEnableVertexAttribArray(this.attrib_color_location);
         GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
@@ -132,12 +133,13 @@ public class ProgramShader_simple extends ProgramShader {
     }
 
     // **************************************************************************
-    public void disableShaderVar() {
+    @Override
+    public void disableAttribs() {
         GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
         GLES20.glDisableVertexAttribArray(this.attrib_color_location);
         GLES20.glDisableVertexAttribArray(this.attrib_texture_coord_location);
-        GLES20.glDisableVertexAttribArray(this.uniform_mvp_location);
-        GLES20.glDisableVertexAttribArray(this.uniform_texture_location);
+    //    GLES20.glDisableVertexAttribArray(this.uniform_mvp_location);
+    //    GLES20.glDisableVertexAttribArray(this.uniform_texture_location);
 
     }
 

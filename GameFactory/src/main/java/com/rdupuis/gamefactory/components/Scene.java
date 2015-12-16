@@ -123,13 +123,6 @@ public class Scene implements GLSurfaceView.Renderer {
         return this.mActivity;
     }
 
-    /**
-     * @return
-     */
-    public float[] getProjectionView() {
-        return this.mProjectionView;
-    }
-
     public ColliderManager getColliderManager() {
         return mColliderManager;
     }
@@ -150,7 +143,7 @@ public class Scene implements GLSurfaceView.Renderer {
         this.mViewMode = VIEW_MODE.ORTHO;
 
         setTexManager(new TextureManager(activity));
-        setPSManager(new ProgramShaderManager(activity));
+        setPSManager(new ProgramShaderManager(this));
         setAnimationManager(new AnimationManager());
         setGOManager(new GameObjectManager(this));
         setColliderManager(new ColliderManager());
@@ -281,7 +274,7 @@ public class Scene implements GLSurfaceView.Renderer {
 
     }
 
-    public float[] getProjection() {
+    public float[] getProjectionView() {
         if (this.getViewMode() == Scene.VIEW_MODE.ORTHO) {
             return this.mProjectionORTH;
         }
@@ -295,7 +288,6 @@ public class Scene implements GLSurfaceView.Renderer {
         /*********************************************************************************
          * Début du cycle de rendu
          ********************************************************************************/
-
         //on mémorise le moment où on commence le cycle
         float startDrawingTime = SystemClock.currentThreadTimeMillis();
 
@@ -304,7 +296,7 @@ public class Scene implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         /***************************************************************************************
-         * Calcul de la Matrice de VIEW : mVMatrix
+         * Mise à jour de la Matrice de projetction en fonction de la position de la caméra
          *************************************************************************************/
         if (this.getViewMode() == VIEW_MODE.CAMERA) {
             Matrix.setLookAtM(mVMatrix, 0, mCamera.centerX, mCamera.centerY, mCamera.centerZ,
@@ -312,14 +304,10 @@ public class Scene implements GLSurfaceView.Renderer {
                     mCamera.orientX, mCamera.orientY, mCamera.orientZ);
         }
 
-        // Calculate the projection and view transformation
-        // Matrix.multiplyMM(mMVPMatrix, 0, mProjMatrix, 0, mVMatrix, 0);
+        /** Mise à jour des objets*/
+        this.getGOManager().update();
 
-        /** Initialisation du pointeur de touché */
-        this.getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG).mainUpdate();
-
-        /**
-         * jouer les animations si elles éxistent */
+        /** jouer les animations si elles éxistent */
         this.animationManager.playAnimations();
 
         /** on check les colissions entre tous les éléments de la scène
@@ -329,13 +317,13 @@ public class Scene implements GLSurfaceView.Renderer {
          * du coup tout le monde est en colision.
          * pour éviter le problème, on ne chek pas les colissions sur la première Frame
          */
-        if (!firstFrame) {
+        //if (!firstFrame) {
             this.getColliderManager().updateCollisionsList();
-        }
+        //}
 
         /**
-         * on appel le manager d'objet pour dessiner */
-        this.getGOManager().draw();
+         * Rendu des objets à dessiner*/
+        this.getPSManager().render(this.getGOManager().GOList());
 
         /****************************************************************************
          * Pour une Animation fluide, 60 FPS sont sufisants

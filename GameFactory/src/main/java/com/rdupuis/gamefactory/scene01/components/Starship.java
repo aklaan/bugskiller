@@ -27,7 +27,7 @@ public class Starship extends Rectangle2D {
 	}
 
 	@Override
-	public void onUpdate() {
+	public void update() {
 
 		// on incrémente l'angle de rotation a chaque images
 		// ici je souhaite que l'objet tourne sur lui même constament
@@ -133,7 +133,7 @@ public class Starship extends Rectangle2D {
 		// GLES20.glVertexAttribPointer(sh.attrib_color_location, 4,
 		// GLES20.GL_FLOAT, false, Vertex.Vertex_TEXT_SIZE_BYTES, color);
 
-		sh.enableShaderVar();
+		sh.enableAttribs();
 
 		// �quivalent du PUSH
 		// this.mModelView = renderer.mModelView.clone();

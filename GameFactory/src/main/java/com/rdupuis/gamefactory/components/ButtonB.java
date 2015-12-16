@@ -1,17 +1,14 @@
 package com.rdupuis.gamefactory.components;
 
 import android.os.SystemClock;
-import android.util.Log;
-
 
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
 import com.rdupuis.gamefactory.interfaces.Clikable;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 
-public class Button extends Rectangle2D implements Clikable {
+public class ButtonB extends Rectangle2D implements Clikable {
     public enum ButtonStatus {
         UP, DOWN
     }
@@ -29,7 +26,7 @@ public class Button extends Rectangle2D implements Clikable {
 
     private final ArrayList<GLButtonListener> eventListenerList = new ArrayList<GLButtonListener>();
 
-    public Button(float x, float y, float witdth, float height, Texture textureUp, Texture textureDown) {
+    public ButtonB(float x, float y, float witdth, float height, Texture textureUp, Texture textureDown) {
         super(DrawingMode.FILL);
         this.originalHeight = height;
         this.originalWidth = witdth;
@@ -44,6 +41,8 @@ public class Button extends Rectangle2D implements Clikable {
         this.enableColision();
         this.isStatic = false;
         this.textureEnabled = true;
+        this.isVisible = false;
+        this.setAlpha(0.f);
     }
 
     public void addGLButtonListener(GLButtonListener glButtonListener) {
@@ -93,9 +92,9 @@ public class Button extends Rectangle2D implements Clikable {
 
         //si on est en train d'écouter ce que fait l'utilisateur
         if (this.listening) {
+            this.isVisible = true;
+            this.setAlpha(this.getAlpha() + 0.01f);
 
-            this.setWidth(this.getWidth() + 2.f);
-            this.setHeight(this.getHeight() + 2.f);
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
                 //on a levé le doigt avant de délai d'un long click
@@ -120,10 +119,10 @@ public class Button extends Rectangle2D implements Clikable {
         }
     }
 
-    private void stopListening(){
+    private void stopListening() {
         this.listening = false;
-        this.setWidth(this.originalWidth);
-        this.setHeight(this.originalHeight);
+        this.setAlpha(0);
+        this.isVisible = false;
     }
 
     /**

@@ -1,10 +1,12 @@
 package com.rdupuis.gamefactory.providers;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.Vertex;
+import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.utils.CONST;
 
 import java.nio.ByteBuffer;
@@ -188,26 +190,50 @@ public class GameObjectManager {
 
     }
 
-
     /**
      *
      */
+public void update(){
+    for (GameObject gameObject:this.GOList()){
+        gameObject.update();
+        updateModelView(gameObject);
+    }
+}
 
 
-    public void draw() {
-        for (GameObject gameObject : this.GOList()) {
+    /**
+     * Mise à jour de la ModelView pour prendre en compte les
+     * modification apportées à l'ojet
+     * taille - position - rotation
+     * <p/>
+     * /!\ l'ordre où on applique les transformation et hyper important
+     * il faut toujours faire : translation*rotation*scale
+     */
 
-            //Mises à jour
-            gameObject.mainUpdate();
+    public void updateModelView(GameObject gameObject) {
+        float[] wrkRotationMatrix = new float[16];
+        float[] modelView = new float[16];
 
-            //Dessiner
-            if (gameObject.isVisible) {
-//                Log.e("draw", gameObject.getTagName());
-                gameObject.drawWithStride(getScene().getProjection());
-            }
-        }
+        //on initialise une matrice identitaire
+        Matrix.setIdentityM(modelView, 0);
+
+        //on fabrique une matrice de déplacement vers les coordonnées x,y,z
+        Matrix.translateM(modelView, 0, gameObject.X, gameObject.Y, gameObject.Z);
+
+        //on fabrique une matrice de rotation
+        Matrix.setRotateEulerM(wrkRotationMatrix, 0, gameObject.angleRADX,
+                gameObject.angleRADY, gameObject.angleRADZ);
+
+        //Calcul de la matrice ModelView
+        Matrix.multiplyMM(gameObject.mModelView, 0, modelView, 0,
+                wrkRotationMatrix, 0);
+
+        //Scales matrix m in place by sx, sy, and sz.
+        Matrix.scaleM(gameObject.mModelView, 0, gameObject.getWidth(), gameObject.getHeight(), 0.f);
 
     }
+
+
 
 }
 

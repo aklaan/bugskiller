@@ -21,7 +21,7 @@ public class PetitRobot extends Rectangle2D {
 	}
 
 	@Override
-	public void onUpdate(){
+	public void update(){
 		float limit_y = this.getScene().getHeight();
 		//Log.i("debug",String.valueOf(activity.mGLSurfaceView.getHeight()));
 		//Log.i("debug",String.valueOf(i));

@@ -30,7 +30,7 @@ public class UserFinger extends Rectangle2D {
     }
 
     @Override
-    public void onUpdate() {
+    public void update() {
   //      Log.e("userFinger","on Update");
 
         //on réinitialise les coordonées
