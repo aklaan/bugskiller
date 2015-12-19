@@ -633,29 +633,6 @@ public class GameObject extends AbstractGameObject implements Cloneable {
 
 
 
-    /**
-     * Fonction de mise à jour générale
-     */
-
-    public void mainUpdate_old() {
-
-        // traiter les opérations diverses à effectuer lors de
-        // la mise à jour
-  //      this.update();
-
-
-        // A la fin des mises à jour on connais les nouvelles coordonées
-        // on peut calculer la nouvelle matrice modelView
-//        this.updateModelView();
-
-        // -----------------------------------------------------
-        // Traiter les évènements écoutés sur les autres objets
-        // -----------------------------------------------------
-//        updateListerners();
-
-    }
-
-
     /********************************************************
      * On écoute les objets
      * note : on dépend de l'ordre dans lequel sont traité

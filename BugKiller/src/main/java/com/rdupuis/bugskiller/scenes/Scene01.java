@@ -2,10 +2,12 @@ package com.rdupuis.bugskiller.scenes;
 
 import android.net.Uri;
 import android.util.Log;
+import android.widget.TextView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.rdupuis.bugskiller.MainActivity;
 import com.rdupuis.bugskiller.R;
 import com.rdupuis.bugskiller.gamecomponents.Bug;
 import com.rdupuis.gamefactory.animations.AnimationFadeOut;
@@ -30,7 +32,7 @@ public class Scene01 extends Scene {
     private final String TAG_BUG = "scene1:bug";
     private final String TAG_BACKGROUND = "scene1:background";
     private final String TAG_BUTTON = "scene1:button";
-
+public String aaa;
     public Scene01(OpenGLActivity activity) {
         super(activity);
         // TODO Auto-generated constructor stub
@@ -96,6 +98,7 @@ public class Scene01 extends Scene {
 
         };
 
+
         button.addGLButtonListener(toto);
 
 
@@ -109,9 +112,9 @@ public class Scene01 extends Scene {
         buttonb.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
         this.addToScene(buttonb);
 
-
-
     }
+
+
 
 
     @Override
@@ -124,6 +127,8 @@ public class Scene01 extends Scene {
 
         //on défini le simple comme shader par defaut.
         this.getPSManager().setDefaultSader(ps);
+;
+
     }
 
     @Override
@@ -135,6 +140,8 @@ public class Scene01 extends Scene {
         this.getTexManager().add(R.string.spaceship);
         this.getTexManager().add(R.string.emptycircle);
     }
+
+
 
 
 }

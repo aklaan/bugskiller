@@ -3,6 +3,7 @@ package com.rdupuis.gamefactory.shaders;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.rdupuis.gamefactory.components.CopoundGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.Vertex;
@@ -12,6 +13,18 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 public class ProgramShader extends AbstractProgramShader {
+
+    // déclaration des attributs génériques au shader
+    public final String VSH_ATTRIB_VERTEX_COORD = "aPosition";
+    public final String VSH_ATTRIB_COLOR = "aColor";
+    public final String VSH_ATTRIB_TEXTURE_COORD = "aTexCoord";
+
+
+    // déclaration des uniforms génériques au shader
+    public final String VSH_UNIFORM_MVP = "uMvp";
+    public final String FSH_UNIFORM_TEXTURE = "uTex0";
+    public final String FSH_UNIFORM_ALPHA = "uAlpha";
+
 
     public String mName;
 
@@ -26,30 +39,23 @@ public class ProgramShader extends AbstractProgramShader {
     public String fragmentShaderSource;
     public int FragmentShader_location;
 
-    // déclaration des attributs spécifiques au shader
-    public String attrib_vertex_coord_name;
+    //Localisation des attributs
     public int attrib_vertex_coord_location;
-
-    public String attrib_color_name;
     public int attrib_color_location;
-
-    public String attrib_texture_coord_name;
     public int attrib_texture_coord_location;
 
-    public String uniform_mvp_name;
+    //localisation des Uniform
     public int uniform_mvp_location;
-
-    public String uniform_texture_buffer_name;
     public int uniform_texture_location;
 
-    public String uniform_alpha_name;
+    //TODO remplacer l'ALPHA par l'AMBIANT RGBA
     public int uniform_alpha_location;
 
 
     public ProgramShader() {
-        mGLSLProgram_location = 0;
-        VertexShader_location = 0;
-        FragmentShader_location = 0;
+        this.mGLSLProgram_location = 0;
+        this.VertexShader_location = 0;
+        this.FragmentShader_location = 0;
         this.attrib_vertex_coord_location = -1;
         this.attrib_color_location = -1;
         this.attrib_texture_coord_location = -1;
@@ -66,10 +72,31 @@ public class ProgramShader extends AbstractProgramShader {
         this.initLocations();
     }
 
+    @Override
     public void initLocations() {
+        // on récupère l'index de la zone "coordonée de vertex dans le program Shader
+        this.attrib_vertex_coord_location = GLES20.glGetAttribLocation(
+                mGLSLProgram_location, this.VSH_ATTRIB_VERTEX_COORD);
 
+        this.attrib_color_location = GLES20.glGetAttribLocation(
+                mGLSLProgram_location, this.VSH_ATTRIB_COLOR);
+
+        this.attrib_texture_coord_location = GLES20.glGetAttribLocation(
+                this.mGLSLProgram_location, this.VSH_ATTRIB_TEXTURE_COORD);
+
+        // les Uniforms
+
+        this.uniform_mvp_location = GLES20.glGetUniformLocation(
+                this.mGLSLProgram_location, this.VSH_UNIFORM_MVP);
+
+        this.uniform_texture_location = GLES20.glGetUniformLocation(
+                this.mGLSLProgram_location, this.FSH_UNIFORM_TEXTURE);
+
+        this.uniform_alpha_location = GLES20.glGetUniformLocation(
+                this.mGLSLProgram_location, this.FSH_UNIFORM_ALPHA);
     }
 
+    @Override
     public void initCode() {
 
     }
@@ -192,7 +219,7 @@ public class ProgramShader extends AbstractProgramShader {
     /**
      * @param VboBufferIndex
      */
-    public void setVBOVerticesCoord(int VboBufferIndex) {
+    public void XXXXXsetVBOVerticesCoord(int VboBufferIndex) {
         //on se positionne sur le buffer souhaité
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VboBufferIndex);
 
@@ -214,15 +241,38 @@ public class ProgramShader extends AbstractProgramShader {
 
     }
 
+    // *******************************************************************
+    // Attention : il ne faut pas rendre enable un attribut non valorisé
+    // sinon c'est ecran noir !
     @Override
     public void enableAttribs() {
-
+        GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
+        GLES20.glEnableVertexAttribArray(this.attrib_color_location);
+        GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
     }
 
+    // **************************************************************************
     @Override
     public void disableAttribs() {
-
+        GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
+        GLES20.glDisableVertexAttribArray(this.attrib_color_location);
+        GLES20.glDisableVertexAttribArray(this.attrib_texture_coord_location);
     }
+
+
+    /**
+     * Pour dessiner les objets composé, il faut dessiner les objets le composant
+     * @param copoundGameObject
+     * @param projectionMatrix
+     */
+    public void draw(CopoundGameObject copoundGameObject, float[] projectionMatrix){
+
+        for (GameObject gameObject:copoundGameObject.getGameObjectList()){
+            this.draw(gameObject, projectionMatrix);
+        }
+    }
+
+
 
 
     /**

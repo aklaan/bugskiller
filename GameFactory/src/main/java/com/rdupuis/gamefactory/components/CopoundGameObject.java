@@ -6,6 +6,12 @@ import java.util.ArrayList;
  * Created by rodol on 14/12/2015.
  */
 public class CopoundGameObject extends GameObject {
+
+    private ArrayList<GameObject> mGameObjectList;
+
+    /****************************************************************
+     * Getter & setter
+     ***************************************************************/
     public ArrayList<GameObject> getGameObjectList() {
         return mGameObjectList;
     }
@@ -14,10 +20,10 @@ public class CopoundGameObject extends GameObject {
         this.mGameObjectList = mGameObjectList;
     }
 
-    private ArrayList<GameObject> mGameObjectList;
-
+    /******************************************************************
+     * Constructeur
+     ***************************************************************/
     public CopoundGameObject() {
-
         this.setGameObjectList(new ArrayList<GameObject>());
     }
 
@@ -27,9 +33,5 @@ public class CopoundGameObject extends GameObject {
         }
     }
 
-    public void draw() {
-        for (GameObject gameObject : this.getGameObjectList()) {
-            gameObject.draw();
-        }
-    }
+
 }

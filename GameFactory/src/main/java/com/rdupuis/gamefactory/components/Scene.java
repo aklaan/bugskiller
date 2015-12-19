@@ -182,6 +182,7 @@ public class Scene implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl2, EGLConfig eglConfig) {
 
+
         // on ne peux pas créer de programe Shader en dehors du contexte
         // opengl. donc le provider est à recréer à chaque fois que l'on contruit la scène
         // c'est à dire : au démarrage et à chaque fois que l'on incline l'écran
@@ -200,7 +201,7 @@ public class Scene implements GLSurfaceView.Renderer {
         // on défini la couleur de base pour initialiser le BUFFER de rendu
         // a chaque Frame, lorsque l'on fera un appel GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         // on va remplir le back buffer avec la couleur pré-définie ici
-        GLES20.glClearColor(0.3f, 0.2f, 0.2f, 1.0f);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         // Activattion de la gestion de l'Alpha
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -281,6 +282,8 @@ public class Scene implements GLSurfaceView.Renderer {
         return this.mProjectionView;
 
     }
+
+
 
     @Override
     public void onDrawFrame(GL10 gl) {

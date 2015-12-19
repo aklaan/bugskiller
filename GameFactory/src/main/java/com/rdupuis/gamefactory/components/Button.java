@@ -94,8 +94,8 @@ public class Button extends Rectangle2D implements Clikable {
         //si on est en train d'écouter ce que fait l'utilisateur
         if (this.listening) {
 
-            this.setWidth(this.getWidth() + 2.f);
-            this.setHeight(this.getHeight() + 2.f);
+          //  this.setWidth(this.getWidth() + 2.f);
+          //  this.setHeight(this.getHeight() + 2.f);
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
                 //on a levé le doigt avant de délai d'un long click

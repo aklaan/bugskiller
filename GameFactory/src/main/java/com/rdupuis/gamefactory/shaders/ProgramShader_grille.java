@@ -5,27 +5,16 @@ import android.opengl.GLES20;
 
 public class ProgramShader_grille extends ProgramShader {
 
-	// déclaration des attributs spécifiques au shader
-	public final String VSH_ATTRIB_VERTEX_COORD = "aPosition";
-	public final String VSH_ATTRIB_COLOR = "aColor";
-	public final String VSH_ATTRIB_TEXTURE_COORD = "aTexCoord";
-
-	// déclaration des uniforms spécifiques au shader
-	public final String VSH_UNIFORM_MVP = "uMvp";
-	public final String FSH_UNIFORM_TEXTURE = "tex0";
 
 	public ProgramShader_grille() {
+
 		super();
+		this.mName = "grille";
+
 	}
 
 	@Override
 	public void initCode() {
-		this.mName = "grille";
-		this.attrib_vertex_coord_name = this.VSH_ATTRIB_VERTEX_COORD;
-		this.attrib_color_name = this.VSH_ATTRIB_COLOR;
-		this.attrib_texture_coord_name = this.VSH_ATTRIB_TEXTURE_COORD;
-		this.uniform_mvp_name = this.VSH_UNIFORM_MVP;
-		this.uniform_texture_buffer_name = this.FSH_UNIFORM_TEXTURE;
 
 		this.fragmentShaderSource = "#ifdef GL_ES \n"
 				+ " precision highp float; \n" + " #endif \n"
@@ -93,10 +82,7 @@ public class ProgramShader_grille extends ProgramShader {
 		// GLES20.glEnableVertexAttribArray(this.attrib_color_location);
 		GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
 
-		// /les uniforms ne sont pas attrib !!
-		// GLES20.glEnableVertexAttribArray(this.uniform_mvp_location);
-		// GLES20.glEnableVertexAttribArray(this.uniform_texture_location);
-	}
+		}
 
 	// **************************************************************************
 	/**
@@ -107,8 +93,6 @@ public class ProgramShader_grille extends ProgramShader {
 		GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
 		GLES20.glDisableVertexAttribArray(this.attrib_color_location);
 		GLES20.glDisableVertexAttribArray(this.attrib_texture_coord_location);
-		GLES20.glDisableVertexAttribArray(this.uniform_mvp_location);
-		GLES20.glDisableVertexAttribArray(this.uniform_texture_location);
 
 	}
 

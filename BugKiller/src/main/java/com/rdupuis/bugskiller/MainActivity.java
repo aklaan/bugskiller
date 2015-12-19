@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends OpenGLActivity {
 
+    public TextView tv;
+    public String texte;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,7 +24,6 @@ public class MainActivity extends OpenGLActivity {
 
         //
 
-        mGLSurfaceView.setRenderer(new Scene01(this));
        // mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         EditText editText = new EditText(this);
         editText.setText("Bonjour");
@@ -31,6 +33,15 @@ public class MainActivity extends OpenGLActivity {
         View toto = getLayoutInflater().inflate(R.layout.activity_main,null);
 
        addContentView(toto, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        this.tv = (TextView) this.findViewById(R.id.boxx);
+
+        mGLSurfaceView.setRenderer(new Scene01(this));
+
+    }
+
+
+    public void test(){
+         this.tv.setText(texte);
 
     }
 

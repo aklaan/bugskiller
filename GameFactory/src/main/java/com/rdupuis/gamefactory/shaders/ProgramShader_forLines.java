@@ -6,27 +6,15 @@ import android.opengl.GLES20;
 public class ProgramShader_forLines extends ProgramShader {
 
     public static final String SHADER_FOR_LINES = "SHDR_FOR_LINES";
-    // déclaration des attributs spécifiques au shader
-    public final String VSH_ATTRIB_VERTEX_COORD = "aPosition";
-    public final String VSH_ATTRIB_COLOR = "aColor";
-    public final String VSH_ATTRIB_TEXTURE_COORD = "aTexCoord";
-
-    // déclaration des uniforms spécifiques au shader
-    public final String VSH_UNIFORM_MVP = "uMvp";
-
 
     public ProgramShader_forLines() {
         super();
+        this.mName = SHADER_FOR_LINES;
 
     }
 
     @Override
     public void initCode() {
-        this.mName = SHADER_FOR_LINES;
-        this.attrib_vertex_coord_name = this.VSH_ATTRIB_VERTEX_COORD;
-        this.attrib_color_name = this.VSH_ATTRIB_COLOR;
-        this.uniform_mvp_name = this.VSH_UNIFORM_MVP;
-
 
         this.fragmentShaderSource =
                 "#ifdef GL_ES \n"
@@ -67,7 +55,6 @@ public class ProgramShader_forLines extends ProgramShader {
                 mGLSLProgram_location, this.VSH_ATTRIB_VERTEX_COORD);
         this.attrib_color_location = GLES20.glGetAttribLocation(
                 mGLSLProgram_location, this.VSH_ATTRIB_COLOR);
-
 
         // les Uniforms
         this.uniform_mvp_location = GLES20.glGetUniformLocation(

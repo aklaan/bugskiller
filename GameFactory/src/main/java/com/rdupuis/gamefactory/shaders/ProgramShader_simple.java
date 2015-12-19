@@ -1,34 +1,14 @@
 package com.rdupuis.gamefactory.shaders;
 
-
-import android.opengl.GLES20;
-
 public class ProgramShader_simple extends ProgramShader {
-
-    // déclaration des attributs spécifiques au shader
-    public final String VSH_ATTRIB_VERTEX_COORD = "aPosition";
-    public final String VSH_ATTRIB_COLOR = "aColor";
-    public final String VSH_ATTRIB_TEXTURE_COORD = "aTexCoord";
-
-
-    // déclaration des uniforms spécifiques au shader
-    public final String VSH_UNIFORM_MVP = "uMvp";
-    public final String FSH_UNIFORM_TEXTURE = "uTex0";
-    public final String FSH_UNIFORM_ALPHA = "uAlpha";
 
     public ProgramShader_simple() {
         super();
-
     }
 
     @Override
     public void initCode() {
         this.mName = "simple";
-        this.attrib_vertex_coord_name = this.VSH_ATTRIB_VERTEX_COORD;
-        this.attrib_color_name = this.VSH_ATTRIB_COLOR;
-        this.attrib_texture_coord_name = this.VSH_ATTRIB_TEXTURE_COORD;
-        this.uniform_mvp_name = this.VSH_UNIFORM_MVP;
-        this.uniform_texture_buffer_name = this.FSH_UNIFORM_TEXTURE;
 
         this.fragmentShaderSource = "#ifdef GL_ES \n"
                 // pour les fragment shader, il n'existe pas de de précision par défaut
@@ -42,9 +22,9 @@ public class ProgramShader_simple extends ProgramShader {
                 + " varying vec4 vVertexColor;"
                 + " void main() {"
 
-               //   + "    gl_FragColor =  vec4(1.,1.,1.,1.);"
+                //   + "    gl_FragColor =  vec4(1.,1.,1.,1.);"
 
-              //   + "    gl_FragColor =  vVertexColor;"
+                //   + "    gl_FragColor =  vVertexColor;"
                 + "gl_FragColor = texture2D(" + FSH_UNIFORM_TEXTURE + ", vTextureCoord) * " + this.FSH_UNIFORM_ALPHA + "* vVertexColor; "
                 // +
                 // "    gl_FragColor =  vec4(sin(pos.x), sin(pos.y), 0.0, 1.0);"
@@ -58,10 +38,11 @@ public class ProgramShader_simple extends ProgramShader {
 
                 // par defaut si on ne précise rien toutes les variables du vertex
                 // shader sont en hight precision
+
                 // si on réduit la précision, on gagne en rapididté mais on perd
                 // potentiellement en qualité (artefacts)
                 // on peu préciser la précision sur une variable en particulier
-                // exemlple :
+                // exemple :
                 // highp vec4 position;
                 // varying lowp vec4 color
 
@@ -88,58 +69,6 @@ public class ProgramShader_simple extends ProgramShader {
                         // cette commande doit toujours être la dernière du vertex shader.
                         + "	gl_Position = " + this.VSH_UNIFORM_MVP + " * vec4(" + this.VSH_ATTRIB_VERTEX_COORD + ".xyz, 1.);"
                         + "}";
-
-    }
-
-    /**
-     * @Override public void make() { super.make(); this.initLocations(); }
-     */
-    @Override
-    public void initLocations() {
-        // on récupère l'index de la zone "coordonée de vertex dans le program Shader
-        this.attrib_vertex_coord_location = GLES20.glGetAttribLocation(
-                mGLSLProgram_location, this.VSH_ATTRIB_VERTEX_COORD);
-
-        this.attrib_color_location = GLES20.glGetAttribLocation(
-                mGLSLProgram_location, this.VSH_ATTRIB_COLOR);
-
-        this.attrib_texture_coord_location = GLES20.glGetAttribLocation(
-                this.mGLSLProgram_location, this.VSH_ATTRIB_TEXTURE_COORD);
-
-        // les Uniforms
-
-        this.uniform_mvp_location = GLES20.glGetUniformLocation(
-                this.mGLSLProgram_location, this.VSH_UNIFORM_MVP);
-
-        this.uniform_texture_location = GLES20.glGetUniformLocation(
-                this.mGLSLProgram_location, this.FSH_UNIFORM_TEXTURE);
-
-        this.uniform_alpha_location = GLES20.glGetUniformLocation(
-                this.mGLSLProgram_location, this.FSH_UNIFORM_ALPHA);
-    }
-
-    // *******************************************************************
-    // Attention : il ne faut pas rendre enable un attribut non valorisé
-    // sinon c'est ecran noir !
-    @Override
-    public void enableAttribs() {
-        GLES20.glEnableVertexAttribArray(this.attrib_vertex_coord_location);
-        GLES20.glEnableVertexAttribArray(this.attrib_color_location);
-        GLES20.glEnableVertexAttribArray(this.attrib_texture_coord_location);
-
-        // /les uniforms ne sont pas attrib !!
-        // GLES20.glEnableVertexAttribArray(this.uniform_mvp_location);
-        // GLES20.glEnableVertexAttribArray(this.uniform_texture_location);
-    }
-
-    // **************************************************************************
-    @Override
-    public void disableAttribs() {
-        GLES20.glDisableVertexAttribArray(this.attrib_vertex_coord_location);
-        GLES20.glDisableVertexAttribArray(this.attrib_color_location);
-        GLES20.glDisableVertexAttribArray(this.attrib_texture_coord_location);
-    //    GLES20.glDisableVertexAttribArray(this.uniform_mvp_location);
-    //    GLES20.glDisableVertexAttribArray(this.uniform_texture_location);
 
     }
 

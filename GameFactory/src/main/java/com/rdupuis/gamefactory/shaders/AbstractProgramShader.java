@@ -9,5 +9,7 @@ public abstract void enableAttribs();
 
 public abstract void disableAttribs();
 
+    public abstract void initLocations();
 
+    public abstract void initCode();
 }
