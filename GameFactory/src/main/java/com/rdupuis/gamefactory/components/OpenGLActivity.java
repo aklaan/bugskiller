@@ -9,17 +9,19 @@ import android.content.DialogInterface;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
+
+import java.util.logging.Handler;
 
 public class OpenGLActivity extends Activity {
 
 	public static float DEFAULT_ZOOM_FACTOR = 2.f;
 	// ! OpenGL SurfaceView
 	public MySurfaceView mGLSurfaceView;
-	
 
 
-	
-	
+
 	
 	
 	public MySurfaceView getSurfaceView(){

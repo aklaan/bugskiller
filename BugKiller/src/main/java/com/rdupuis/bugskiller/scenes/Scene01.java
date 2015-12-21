@@ -1,6 +1,7 @@
 package com.rdupuis.bugskiller.scenes;
 
 import android.net.Uri;
+import android.os.Message;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -32,7 +33,8 @@ public class Scene01 extends Scene {
     private final String TAG_BUG = "scene1:bug";
     private final String TAG_BACKGROUND = "scene1:background";
     private final String TAG_BUTTON = "scene1:button";
-public String aaa;
+    public String aaa;
+
     public Scene01(OpenGLActivity activity) {
         super(activity);
         // TODO Auto-generated constructor stub
@@ -59,10 +61,10 @@ public String aaa;
         for (int i = 1; i < 50; i++) {
             Bug bug = new Bug(this.getTexManager().getTextureById(R.string.spaceship),
                     this.getTexManager().getTextureById(R.string.bugdead));
-            bug.setWidth(30);
-            bug.setHeight(30);
-            bug.setCoord((float) (this.getWidth() / 2) + 5 * i,
-                    (float) (this.getHeight() / 2) + 5 * i);
+            bug.setWidth(10);
+            bug.setHeight(10);
+            bug.setCoord((float)  5 * i,
+                    (float)  5 * i);
             bug.setTagName(TAG_BUG);
 
             //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
@@ -73,7 +75,7 @@ public String aaa;
         //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
         Button button;
         button = new Button(450, 150, 200, 200, this.getTexManager().getTextureById(R.string.circle),
-                this.getTexManager().getTextureById(R.string.circle));
+                this.getTexManager().getTextureById(R.string.spaceship));
         button.setTagName(TAG_BUTTON);
         //on place le bouton au centre de la vue
         button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
@@ -86,6 +88,23 @@ public String aaa;
                 GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
 
+
+                MainActivity toto = (MainActivity) Scene01.this.getActivity();
+
+                toto.texte =  "Click:"+String.valueOf(Math.random());
+
+                //je crée un message vide juste pour focer l'utilisation du Handler
+                // qui est géré par la MainActivity.
+                //ceci me permet de pouvoir mettre à jour les éléments UI, autrement c'est impossible
+                //seul le thead Maiactivity peu modifier les UI dont il a la gerstion
+
+                Message completeMessage =
+                        toto.mHandler.obtainMessage();
+
+                //sendToTarget va actionner la fonction handleMessage du Handle géré par Mainactivity
+                completeMessage.sendToTarget();
+
+
             }
 
             @Override
@@ -94,6 +113,19 @@ public String aaa;
                 GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationFadeOut(bug));
 
+                MainActivity toto = (MainActivity) Scene01.this.getActivity();
+
+                toto.texte = "Long Click:" +
+                        String.valueOf(Math.random());
+
+                //je crée un message vide juste pour focer l'utilisation du Handler
+                // qui est géré par la MainActivity.
+                //ceci me permet de pouvoir mettre à jour les éléments UI, autrement c'est impossible
+                //seul le thead Maiactivity peu modifier les UI dont il a la gerstion
+
+                Message completeMessage =
+                        toto.mHandler.obtainMessage();
+                completeMessage.sendToTarget();
             }
 
         };
@@ -115,8 +147,6 @@ public String aaa;
     }
 
 
-
-
     @Override
     public void loadProgramShader() {
         this.getPSManager().catalogShader.clear();
@@ -127,7 +157,7 @@ public String aaa;
 
         //on défini le simple comme shader par defaut.
         this.getPSManager().setDefaultSader(ps);
-;
+        ;
 
     }
 
@@ -140,8 +170,6 @@ public String aaa;
         this.getTexManager().add(R.string.spaceship);
         this.getTexManager().add(R.string.emptycircle);
     }
-
-
 
 
 }

@@ -24,7 +24,7 @@ public class Button extends Rectangle2D implements Clikable {
     private boolean listening;
     private boolean ON_CLICK_FIRE;
     private final float DELAY_BTWN_TAP = 200; //200ms
-    private final float ON_LONG_CLICK_DELAY = 2000;
+    private final float ON_LONG_CLICK_DELAY = 1000;
     private float originalWidth, originalHeight;
 
     private final ArrayList<GLButtonListener> eventListenerList = new ArrayList<GLButtonListener>();

@@ -21,7 +21,7 @@ public class ButtonB extends Rectangle2D implements Clikable {
     private boolean listening;
     private boolean ON_CLICK_FIRE;
     private final float DELAY_BTWN_TAP = 200; //200ms
-    private final float ON_LONG_CLICK_DELAY = 2000;
+    private final float ON_LONG_CLICK_DELAY = 1000;
     private float originalWidth, originalHeight;
 
     private final ArrayList<GLButtonListener> eventListenerList = new ArrayList<GLButtonListener>();
@@ -93,9 +93,14 @@ public class ButtonB extends Rectangle2D implements Clikable {
         //si on est en train d'écouter ce que fait l'utilisateur
         if (this.listening) {
             this.isVisible = true;
+
+
             this.setAlpha(this.getAlpha() + 0.1f);
-            this.setHeight(this.getHeight()-5.0f);
-            this.setWidth(this.getWidth()-5.0f);
+
+
+
+            this.setHeight((this.getHeight()<0)? 0: this.getHeight()-8.0f);
+            this.setWidth((this.getWidth()<0)? 0: this.getWidth()-8.0f);
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
                 //on a levé le doigt avant de délai d'un long click
