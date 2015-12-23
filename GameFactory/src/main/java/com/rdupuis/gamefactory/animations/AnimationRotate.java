@@ -18,7 +18,8 @@ this.start();
 
 	@Override
 	public void play() {
-    this.getAnimatedGameObject().angleRADZ += 5.5f;
+
+    ///this.getAnimatedGameObject().AngleZ_inc(+5.5f);
     
 	}
 

@@ -25,10 +25,12 @@ public class AnimationChangingColors extends Animation {
     @Override
     public void play() {
 
+        GameObject go = (GameObject) this.getAnimatedGameObject();
         Vertex vertex = new Vertex();
-        for (int i = 0; i < this.getAnimatedGameObject().getVertices().size(); i++) {
 
-            vertex = this.getAnimatedGameObject().getVertices().get(i);
+        for (int i = 0; i < go.getVertices().size(); i++) {
+
+            vertex =  go.getVertices().get(i);
 
 
             if (P1 || P6) {

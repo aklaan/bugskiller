@@ -6,19 +6,15 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
-import com.rdupuis.gamefactory.animations.Animation;
-import com.rdupuis.gamefactory.interfaces.Drawable;
+
 import com.rdupuis.gamefactory.providers.ProgramShaderManager;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
-import com.rdupuis.gamefactory.shaders.ProgramShader_forLines;
-import com.rdupuis.gamefactory.shaders.ProgramShader_simple;
-import com.rdupuis.gamefactory.utils.Tools;
+
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import javax.microedition.khronos.opengles.GL10;
 
 public class GameObject extends AbstractGameObject implements Cloneable {
 
@@ -51,8 +47,9 @@ public class GameObject extends AbstractGameObject implements Cloneable {
     //Top pour activer/désactiver le rendu des textures
     public Boolean textureEnabled;
 
+
     //top pour activer/désactiver le rendu de l'objet
-    public Boolean isVisible;
+    public Boolean mVisibility;
 
     //scène auquel appartient l'objet
     private Scene mScene;
@@ -137,7 +134,6 @@ public class GameObject extends AbstractGameObject implements Cloneable {
     private FloatBuffer mTextCoord;
 
 
-
     /******************************************************************
      * getter & setter
      ****************************************************************/
@@ -202,6 +198,15 @@ public class GameObject extends AbstractGameObject implements Cloneable {
         mTagName = String.valueOf(tagid);
     }
 
+
+    public Boolean getVisibility() {
+        return mVisibility;
+    }
+
+    public void setVisibility(Boolean mVisibility) {
+        this.mVisibility = mVisibility;
+    }
+
     /**
      * @param tagid
      */
@@ -225,19 +230,36 @@ public class GameObject extends AbstractGameObject implements Cloneable {
         this.Z = z;
     }
 
+    public float getX() {
+        return X;
+    }
+
+    public void setX(float x){
+        this.X  =x;
+    }
+
+    public void setY(float y){
+        this.Y  =y;
+    }
+
+    public void setZ(float z){
+        this.Z  =z;
+    }
+
+
     /**
      * @return
      */
-    public float getCoordX() {
-        return X;
+    public float getY() {
+        return Y;
 
     }
 
     /**
      * @return
      */
-    public float getCoordY() {
-        return Y;
+    public float getZ() {
+        return Z;
 
     }
 
@@ -268,7 +290,8 @@ public class GameObject extends AbstractGameObject implements Cloneable {
         mTagName = "";
 
         //visible par défaut
-        isVisible = true;
+        setVisibility(true);
+
 
         //TODO : cette liste doit être géré par le manager et non dans l'objet
         this.mCollideWithList = new ArrayList<GameObject>();
@@ -278,8 +301,6 @@ public class GameObject extends AbstractGameObject implements Cloneable {
 
     }
 
-    //cette fonction est à overrider par les GameObject
-    @Override
     public ArrayList<Vertex> getVertices() {
         ArrayList<Vertex> result = new ArrayList<Vertex>();
         return result;
@@ -296,7 +317,6 @@ public class GameObject extends AbstractGameObject implements Cloneable {
     public void setScene(Scene mScene) {
         this.mScene = mScene;
     }
-
 
 
     /**
@@ -632,7 +652,6 @@ public class GameObject extends AbstractGameObject implements Cloneable {
     }
 
 
-
     /********************************************************
      * On écoute les objets
      * note : on dépend de l'ordre dans lequel sont traité
@@ -728,5 +747,37 @@ public class GameObject extends AbstractGameObject implements Cloneable {
         this.alpha = (alpha > 1) ? 1 : alpha;
     }
 
+
+    /**
+     * Mise à jour de la ModelView pour prendre en compte les
+     * modification apportées à l'ojet
+     * taille - position - rotation
+     * <p/>
+     * /!\ l'ordre où on applique les transformation et hyper important
+     * il faut toujours faire : translation*rotation*scale
+     */
+
+    public void updateModelView() {
+        float[] wrkRotationMatrix = new float[16];
+        float[] modelView = new float[16];
+
+        //on initialise une matrice identitaire
+        Matrix.setIdentityM(modelView, 0);
+
+        //on fabrique une matrice de déplacement vers les coordonnées x,y,z
+        Matrix.translateM(modelView, 0, this.X, this.Y, this.Z);
+
+        //on fabrique une matrice de rotation
+        Matrix.setRotateEulerM(wrkRotationMatrix, 0, this.angleRADX,
+                this.angleRADY, this.angleRADZ);
+
+        //Calcul de la matrice ModelView
+        Matrix.multiplyMM(this.mModelView, 0, modelView, 0,
+                wrkRotationMatrix, 0);
+
+        //Scales matrix m in place by sx, sy, and sz.
+        Matrix.scaleM(this.mModelView, 0, this.getWidth(), this.getHeight(), 0.f);
+
+    }
 
 }

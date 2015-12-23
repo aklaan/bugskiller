@@ -1,5 +1,6 @@
 package com.rdupuis.gamefactory.animations;
 
+import com.rdupuis.gamefactory.components.AbstractGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 
 import android.os.SystemClock;
@@ -18,7 +19,7 @@ public abstract class Animation implements Cloneable {
         PLAYING, STOPPED
     }
 
-    private GameObject animatedGameObject;
+    private AbstractGameObject animatedGameObject;
     private AnimationStatus status;
 
 
@@ -26,12 +27,12 @@ public abstract class Animation implements Cloneable {
      * getters / setters
      *********************************************************/
 
-    public GameObject getAnimatedGameObject() {
+    public AbstractGameObject getAnimatedGameObject() {
         return this.animatedGameObject;
 
     }
 
-    public void setAnimatedGameObject(GameObject gameObject) {
+    public void setAnimatedGameObject(AbstractGameObject gameObject) {
         this.animatedGameObject = gameObject;
 
     }
@@ -57,7 +58,7 @@ public abstract class Animation implements Cloneable {
     }
 
     //constructeur
-    public Animation(GameObject animatedGameObject) {
+    public Animation(AbstractGameObject animatedGameObject) {
         this.animatedGameObject = animatedGameObject;
 
     }
@@ -83,4 +84,6 @@ public abstract class Animation implements Cloneable {
         return (Animation) super.clone();
 
     }
+
+
 }

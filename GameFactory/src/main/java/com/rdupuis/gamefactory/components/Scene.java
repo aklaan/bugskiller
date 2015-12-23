@@ -376,7 +376,7 @@ public class Scene implements GLSurfaceView.Renderer {
      *
      * @param gameobject
      */
-    public void addToScene(GameObject gameobject) {
+    public void addToScene(AbstractGameObject gameobject) {
         gameobject.setScene(this);
         this.getGOManager().add(gameobject);
 
@@ -402,10 +402,10 @@ public class Scene implements GLSurfaceView.Renderer {
      */
     public UserFinger getUserFinger() {
         GameObject result = null;
-        for (GameObject gameObject : this.getGOManager().GOList()) {
+        for (AbstractGameObject gameObject : this.getGOManager().GOList()) {
 
             if (gameObject.getTagName() == UserFinger.USER_FINGER_TAG) {
-                result = gameObject;
+                result = (GameObject) gameObject;
             }
 
         }

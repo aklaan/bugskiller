@@ -21,17 +21,18 @@ public class AnimationRightLeftOnX extends Animation {
 
 	@Override
 	public void play() {
+		GameObject go  = (GameObject) this.getAnimatedGameObject();
 		// se déplacer vers la droite pendant 3 seconde
 		float elapsedTime = SystemClock.elapsedRealtime() - startTime;
 
 		if (elapsedTime < 2000) {
 			// offsetX += 0.5f;
-			this.getAnimatedGameObject().X += offsetX;
+			go.X += offsetX;
 		} else {
 
 			if (elapsedTime >= 2000 && elapsedTime <= 4000) {
 				// offsetX -= 0.5f;
-				this.getAnimatedGameObject().X -= offsetX;
+				go.X -= offsetX;
 			} else {
 				this.setStatus(AnimationStatus.STOPPED);
 			}

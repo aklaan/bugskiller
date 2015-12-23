@@ -3,12 +3,13 @@ package com.rdupuis.gamefactory.providers;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.rdupuis.gamefactory.components.AbstractGameObject;
+import com.rdupuis.gamefactory.components.CopoundGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.shaders.ProgramShader;
 
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -78,7 +79,7 @@ public class ProgramShaderManager {
         this.mCurrentActiveShader = null;
         catalogShader = new HashMap<String, Integer>();
         shaderList = new ArrayList<ProgramShader>();
-        this.gameObjectShaderList = new HashMap<GameObject,ProgramShader>();
+        this.gameObjectShaderList = new HashMap<GameObject, ProgramShader>();
     }
 
 
@@ -145,19 +146,36 @@ public class ProgramShaderManager {
      *
      * @param goList
      */
-    public void render(ArrayList<GameObject> goList) {
-        for (GameObject gameObject : goList) {
+    public void render(ArrayList<AbstractGameObject> goList) {
+        for (AbstractGameObject gameObject : goList) {
 
             //Dessiner
-            if (gameObject.isVisible) {
+            if (gameObject.getVisibility()) {
                 //Appel au shader de l'objet s'il en requiert un en particulier.
                 //sinon on utilise le shader par defaut.
                 if (this.getGameObjectShaderList().get(gameObject) != null) {
                     this.use(this.getGameObjectShaderList().get(gameObject));
                 } else this.use(this.getDefaultShader());
 
-                // on demande su shader de rendre l'objet
-                this.getCurrentActiveShader().draw(gameObject, this.getScene().getProjectionView());
+                //TODO  si c'est un objet composé, il faut dessiner les composants
+
+                if (CopoundGameObject.class.isInstance(gameObject)) {
+
+                    CopoundGameObject cgo = (CopoundGameObject) gameObject;
+
+                    for (GameObject rgo : cgo.getGameObjectList()) {
+
+                        this.getCurrentActiveShader().draw(rgo, this.getScene().getProjectionView());
+                    }
+
+
+                } else {
+                    // on demande su shader de rendre l'objet
+                    GameObject go = (GameObject) gameObject;
+                    this.getCurrentActiveShader().draw(go, this.getScene().getProjectionView());
+                }
+
+
             }
         }
     }

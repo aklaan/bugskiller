@@ -41,7 +41,7 @@ public class ButtonB extends Rectangle2D implements Clikable {
         this.enableColision();
         this.isStatic = false;
         this.textureEnabled = true;
-        this.isVisible = false;
+        this.setVisibility(false);
         this.setAlpha(0.f);
     }
 
@@ -55,7 +55,7 @@ public class ButtonB extends Rectangle2D implements Clikable {
         //  Log.e("button", "on update");
         if (SystemClock.elapsedRealtime() - this.lastTap != DELAY_BTWN_TAP) {
 
-            GameObject uf = this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG);
+            GameObject uf = (GameObject) this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG);
 
             if (this.getScene().getColliderManager().isCollide(this, uf)) {
                 //        Log.e("button", "set texture down");
@@ -92,14 +92,11 @@ public class ButtonB extends Rectangle2D implements Clikable {
 
         //si on est en train d'écouter ce que fait l'utilisateur
         if (this.listening) {
-            this.isVisible = true;
-
+            this.setVisibility(true);
 
             this.setAlpha(this.getAlpha() + 0.1f);
 
-
-
-            this.setHeight((this.getHeight()<0)? 0: this.getHeight()-8.0f);
+            this.setHeight((this.getHeight() < 0) ? 0 : this.getHeight() - 8.0f);
             this.setWidth((this.getWidth()<0)? 0: this.getWidth()-8.0f);
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
@@ -128,9 +125,9 @@ public class ButtonB extends Rectangle2D implements Clikable {
     private void stopListening() {
         this.listening = false;
         this.setAlpha(0);
-        this.isVisible = false;
+        this.setVisibility(false);
         this.setHeight(this.originalHeight);
-    this.setWidth(this.originalWidth);
+        this.setWidth(this.originalWidth);
     }
 
     /**

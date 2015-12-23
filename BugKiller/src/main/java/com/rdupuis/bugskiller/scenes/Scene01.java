@@ -1,20 +1,18 @@
 package com.rdupuis.bugskiller.scenes;
 
-import android.net.Uri;
 import android.os.Message;
 import android.util.Log;
-import android.widget.TextView;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import com.rdupuis.bugskiller.MainActivity;
 import com.rdupuis.bugskiller.R;
 import com.rdupuis.bugskiller.gamecomponents.Bug;
 import com.rdupuis.gamefactory.animations.AnimationFadeOut;
 import com.rdupuis.gamefactory.animations.AnimationRotate;
+import com.rdupuis.gamefactory.components.AbstractGameObject;
 import com.rdupuis.gamefactory.components.Button;
+import com.rdupuis.gamefactory.components.ButtonA;
 import com.rdupuis.gamefactory.components.ButtonB;
+import com.rdupuis.gamefactory.components.CopoundGameObject;
 import com.rdupuis.gamefactory.components.GLButtonListener;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.OpenGLActivity;
@@ -52,7 +50,8 @@ public class Scene01 extends Scene {
         background.setTagName(TAG_BACKGROUND);
         background.disableColision();
 
-
+        CopoundGameObject copoundGameObject = new CopoundGameObject();
+        copoundGameObject.setTagName(TAG_BUG);
         //   this.getBitmapProvider().linkTexture(R.string.mountains, background);
         //   this.getBitmapProvider().linkTexture(R.string.textureisoland, background);
         //this.addToScene(background);
@@ -63,35 +62,44 @@ public class Scene01 extends Scene {
                     this.getTexManager().getTextureById(R.string.bugdead));
             bug.setWidth(10);
             bug.setHeight(10);
-            bug.setCoord((float)  5 * i,
-                    (float)  5 * i);
-            bug.setTagName(TAG_BUG);
+            bug.setCoord((float) 5 * i,
+                    (float) 5 * i);
+            bug.setTagName(TAG_BUG + ":" + i);
+            bug.setScene(this);
+
 
             //on charge les vertices de Bug dans le buffer 0 qui est dans la mémoire du GPU !!!!
-            this.addToScene(bug);
+            copoundGameObject.add(bug);
+            //this.addToScene(bug);
 
         }
+
+        this.addToScene(copoundGameObject);
+
         //BUTTON
         //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
-        Button button;
-        button = new Button(450, 150, 200, 200, this.getTexManager().getTextureById(R.string.circle),
-                this.getTexManager().getTextureById(R.string.spaceship));
+
+        ButtonA button = new ButtonA(450, 150, 200, 200,
+                this.getTexManager().getTextureById(R.string.circle),
+                this.getTexManager().getTextureById(R.string.spaceship),
+                this.getTexManager().getTextureById(R.string.emptycircle));
         button.setTagName(TAG_BUTTON);
         //on place le bouton au centre de la vue
-        button.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
+        button.setX((float) this.getWidth() / 2);
+        button.setY((float) this.getHeight() / 2);
         this.addToScene(button);
 
         GLButtonListener toto = new GLButtonListener() {
             @Override
             public void onClick() {
                 Log.e("debug", "click");
-                GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
-                Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
+                //       GameObject bug = (GameObject) Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
+                //       Scene01.this.getAnimationManager().addAnimation(new AnimationRotate(bug));
 
 
                 MainActivity toto = (MainActivity) Scene01.this.getActivity();
 
-                toto.texte =  "Click:"+String.valueOf(Math.random());
+                toto.texte = "Click:" + String.valueOf(Math.random());
 
                 //je crée un message vide juste pour focer l'utilisation du Handler
                 // qui est géré par la MainActivity.
@@ -110,7 +118,7 @@ public class Scene01 extends Scene {
             @Override
             public void onLongClick() {
                 Log.e("debug", "long click");
-                GameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
+                AbstractGameObject bug = Scene01.this.getGOManager().getGameObjectByTag(TAG_BUG);
                 Scene01.this.getAnimationManager().addAnimation(new AnimationFadeOut(bug));
 
                 MainActivity toto = (MainActivity) Scene01.this.getActivity();
@@ -132,17 +140,6 @@ public class Scene01 extends Scene {
 
 
         button.addGLButtonListener(toto);
-
-
-        //BUTTON
-        //Button(float x, float y, float witdth, float hight, Texture textureUp, Texture textureDown)
-        ButtonB buttonb;
-        buttonb = new ButtonB(450, 150, 500, 500, this.getTexManager().getTextureById(R.string.emptycircle),
-                this.getTexManager().getTextureById(R.string.emptycircle));
-        buttonb.setTagName(TAG_BUTTON);
-        //on place le bouton au centre de la vue
-        buttonb.setCoord((float) this.getWidth() / 2, (float) this.getHeight() / 2);
-        this.addToScene(buttonb);
 
     }
 

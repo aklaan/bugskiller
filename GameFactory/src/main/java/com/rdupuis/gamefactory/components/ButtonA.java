@@ -1,23 +1,23 @@
 package com.rdupuis.gamefactory.components;
 
 import android.os.SystemClock;
-import android.util.Log;
-
 
 import com.rdupuis.gamefactory.components.shapes.Rectangle2D;
 import com.rdupuis.gamefactory.enums.DrawingMode;
 import com.rdupuis.gamefactory.interfaces.Clikable;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 
-public class Button extends Rectangle2D implements Clikable {
+public class ButtonA extends CopoundGameObject implements Clikable {
     public enum ButtonStatus {
         UP, DOWN
     }
 
+    private final int RECT_A_INDX = 0;
+    private final int RECT_B_INDX = 1;
     public Texture textureUp;
     public Texture textureDown;
+    public Texture textureBack;
     public ButtonStatus status;
     private float lastTap;
     private float elapsedTime;
@@ -25,25 +25,40 @@ public class Button extends Rectangle2D implements Clikable {
     private boolean ON_CLICK_FIRE;
     private final float DELAY_BTWN_TAP = 200; //200ms
     private final float ON_LONG_CLICK_DELAY = 1000;
-    private float originalWidth, originalHeight;
 
     private final ArrayList<GLButtonListener> eventListenerList = new ArrayList<GLButtonListener>();
 
-    public Button(float x, float y, float witdth, float height, Texture textureUp, Texture textureDown) {
-        super(DrawingMode.FILL);
-        this.originalHeight = height;
-        this.originalWidth = witdth;
+    public ButtonA(float x, float y, float witdth, float height, Texture textureUp, Texture textureDown, Texture textureBack) {
+
+        this.textureUp = textureUp;
+        this.textureDown = textureDown;
+        this.textureBack = textureBack;
+
+        Rectangle2D rectangle2D_A = new Rectangle2D(DrawingMode.FILL);
+        rectangle2D_A.setWidth(11);
+        rectangle2D_A.setHeight(11);
+        rectangle2D_A.enableColision();
+        rectangle2D_A.textureEnabled = true;
+
+        Rectangle2D rectangle2D_B = new Rectangle2D(DrawingMode.FILL);
+        rectangle2D_B.textureEnabled = true;
+        rectangle2D_B.setTexture(this.textureBack);
+
+
+        this.getGameObjectList().add(RECT_A_INDX, rectangle2D_A);
+        this.getGameObjectList().add(RECT_B_INDX, rectangle2D_B);
+
+
         this.status = ButtonStatus.UP;
-        this.setCoord(x, y);
+        this.setX(x);
+        this.setY(y);
         this.setHeight(height);
         this.setWidth(witdth);
 
         this.listening = false;
-        this.textureUp = textureUp;
-        this.textureDown = textureDown;
-        this.enableColision();
-        this.isStatic = false;
-        this.textureEnabled = true;
+
+        //this.isStatic = false;
+
     }
 
     public void addGLButtonListener(GLButtonListener glButtonListener) {
@@ -52,15 +67,16 @@ public class Button extends Rectangle2D implements Clikable {
 
     @Override
     public void update() {
-        this.setTexture(this.textureUp);
+
+        this.getGameObjectList().get(RECT_A_INDX).setTexture(this.textureUp);
         //  Log.e("button", "on update");
         if (SystemClock.elapsedRealtime() - this.lastTap != DELAY_BTWN_TAP) {
 
             GameObject uf = (GameObject) this.getScene().getGOManager().getGameObjectByTag(UserFinger.USER_FINGER_TAG);
-
-            if (this.getScene().getColliderManager().isCollide(this, uf)) {
+            GameObject rect_A = this.getGameObjectList().get(RECT_A_INDX);
+            if (this.getScene().getColliderManager().isCollide(rect_A, uf)) {
                 //        Log.e("button", "set texture down");
-                this.setTexture(this.textureDown);
+                this.getGameObjectList().get(RECT_A_INDX).setTexture(this.textureDown);
                 this.status = ButtonStatus.DOWN;
 
                 // si je n'étais en train d'écouler, j'initialise le compteur delai
@@ -80,7 +96,7 @@ public class Button extends Rectangle2D implements Clikable {
 
 
             } else {
-                this.setTexture(textureUp);
+                this.getGameObjectList().get(RECT_A_INDX).setTexture(textureUp);
                 this.status = ButtonStatus.UP;
 
             }
@@ -94,8 +110,17 @@ public class Button extends Rectangle2D implements Clikable {
         //si on est en train d'écouter ce que fait l'utilisateur
         if (this.listening) {
 
-          //  this.setWidth(this.getWidth() + 2.f);
-          //  this.setHeight(this.getHeight() + 2.f);
+            GameObject rect_b = this.getGameObjectList().get(RECT_B_INDX);
+            rect_b.setVisibility(true);
+
+            rect_b.setAlpha(rect_b.getAlpha() + 0.1f);
+
+            rect_b.setHeight((rect_b.getHeight() < 0) ? 0 : rect_b.getHeight() - 8.0f);
+            rect_b.setWidth((rect_b.getWidth() < 0) ? 0 : rect_b.getWidth() - 8.0f);
+
+
+            //  this.setWidth(this.getWidth() + 2.f);
+            //  this.setHeight(this.getHeight() + 2.f);
             //si l'utilisateur a levé le doigt
             if (this.status == ButtonStatus.UP) {
                 //on a levé le doigt avant de délai d'un long click
@@ -120,10 +145,17 @@ public class Button extends Rectangle2D implements Clikable {
         }
     }
 
-    private void stopListening(){
+    private void stopListening() {
         this.listening = false;
-        this.setWidth(this.originalWidth);
-        this.setHeight(this.originalHeight);
+
+        GameObject rect_b = this.getGameObjectList().get(RECT_B_INDX);
+        rect_b.setVisibility(false);
+        rect_b.setAlpha(0);
+
+        rect_b.setHeight(this.getHeight()+100);
+        rect_b.setWidth(this.getWidth()+100);
+
+
     }
 
     /**

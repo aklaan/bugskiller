@@ -68,7 +68,7 @@ public class Bug extends Rectangle2D {
 
         if (this.isAlive()) {
 
-            this.setCoord(this.getCoordX() + this.speedX*stepX, this.getCoordY() + this.speedY*stepY);
+            this.setCoord(this.getX() + this.speedX*stepX, this.getY() + this.speedY*stepY);
 
             float limit_x_min = (this.getWidth() / 2);
             float limit_x_max = this.getScene().getWidth() - (this.getWidth() / 2);
@@ -76,11 +76,11 @@ public class Bug extends Rectangle2D {
             float limit_y_max = this.getScene().getHeight() - (this.getHeight() / 2);
 
 
-            if (this.getCoordX() < limit_x_min || (this.getCoordX() > limit_x_max)) {
+            if (this.getX() < limit_x_min || (this.getX() > limit_x_max)) {
                 this.speedX = -this.speedX;
 
             }
-            if (this.getCoordY() < limit_y_min || (this.getCoordY() > limit_y_max)) {
+            if (this.getY() < limit_y_min || (this.getY() > limit_y_max)) {
                 this.speedY = -this.speedY;
                             }
 

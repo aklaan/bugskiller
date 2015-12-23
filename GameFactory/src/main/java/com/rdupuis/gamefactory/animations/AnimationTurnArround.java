@@ -1,14 +1,15 @@
 package com.rdupuis.gamefactory.animations;
 
+import com.rdupuis.gamefactory.components.AbstractGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 
 public class AnimationTurnArround extends Animation {
 
-	GameObject mCible;
+	AbstractGameObject mCible;
 	float distance;
 	float angle;
 
-	public AnimationTurnArround(GameObject parent, GameObject cible, float distance) {
+	public AnimationTurnArround(AbstractGameObject parent, AbstractGameObject cible, float distance) {
 		super(parent);
 		this.mCible = cible;
 		this.angle = 0.0f;
@@ -27,10 +28,10 @@ public class AnimationTurnArround extends Animation {
 
 		if (this.mCible != null) {
 			this.angle += 0.05f;
-			this.getAnimatedGameObject().X = mCible.X
-					+ (float) (Math.cos(this.angle * this.getSpeed()) * this.distance);
-			this.getAnimatedGameObject().Y = mCible.Y
-					+ (float) (Math.sin(this.angle * this.getSpeed()) * this.distance);
+			this.getAnimatedGameObject().setX(mCible.getX()
+					+ (float) (Math.cos(this.angle * this.getSpeed()) * this.distance));
+			this.getAnimatedGameObject().setY(mCible.getY()
+					+ (float) (Math.sin(this.angle * this.getSpeed()) * this.distance));
 
 		}
 

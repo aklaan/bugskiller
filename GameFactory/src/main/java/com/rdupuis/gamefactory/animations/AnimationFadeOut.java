@@ -1,11 +1,10 @@
 package com.rdupuis.gamefactory.animations;
 
-import com.rdupuis.gamefactory.components.GameObject;
+import com.rdupuis.gamefactory.components.AbstractGameObject;
 
 public class AnimationFadeOut extends Animation {
 
-
-    public AnimationFadeOut(GameObject animatedGameObject) {
+    public AnimationFadeOut(AbstractGameObject animatedGameObject) {
         super(animatedGameObject);
         start();
     }
@@ -21,13 +20,11 @@ public class AnimationFadeOut extends Animation {
     @Override
     public void play() {
 
-        //Log.i("bugAlpha",String.valueOf(this.getParent().getAlpha()));
-
         if (this.getAnimatedGameObject().getAlpha() > 0.001) {
             this.getAnimatedGameObject().setAlpha(
                     this.getAnimatedGameObject().getAlpha() - (this.getSpeed()));
         } else {
-            this.getAnimatedGameObject().setAlpha(0.0f);
+            this.getAnimatedGameObject().setAlpha(1.0f);
             this.stop();
 
         }

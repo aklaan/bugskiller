@@ -28,7 +28,7 @@ public class PetitRobot extends Rectangle2D {
 		
 		float inc = 0.f;
 		
-		if (this.getCoordY()>limit_y || this.getCoordY()<-limit_y){
+		if (this.getY()>limit_y || this.getY()<-limit_y){
 			sens = sens*-1;
 		}  
 		

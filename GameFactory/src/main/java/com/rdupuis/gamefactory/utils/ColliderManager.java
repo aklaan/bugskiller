@@ -4,7 +4,9 @@ package com.rdupuis.gamefactory.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.rdupuis.gamefactory.components.AbstractGameObject;
 import com.rdupuis.gamefactory.components.CollisionBox;
+import com.rdupuis.gamefactory.components.CopoundGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Vertex;
 import com.rdupuis.gamefactory.providers.GameObjectManager;
@@ -38,18 +40,41 @@ public class ColliderManager {
         mCollisionBoxList.clear();
 
         //on crée une boite de collision pour chaque objet qui en necessitent une
-        for (GameObject gameObject : gom.GOList()) {
-            if (gameObject.canCollide) {
-                //gameObject, default Offset X, default Offset Y
-                CollisionBox box = new CollisionBox(gameObject);
-                this.mCollisionBoxList.add(box);
+        for (AbstractGameObject gameObject : gom.GOList()) {
+
+            //TODO : pour le moment je ene traite que les objets "classiques"
+            if (GameObject.class.isInstance(gameObject)) {
+
+                GameObject go = (GameObject) gameObject;
+                if (go.canCollide) {
+                    //gameObject, default Offset X, default Offset Y
+                    CollisionBox box = new CollisionBox(go);
+                    this.mCollisionBoxList.add(box);
+                }
             }
+
+            if (CopoundGameObject.class.isInstance(gameObject)) {
+
+                CopoundGameObject co = (CopoundGameObject) gameObject;
+
+                for (GameObject go : co.getGameObjectList()) {
+
+                    if (go.canCollide) {
+                        //gameObject, default Offset X, default Offset Y
+                        CollisionBox box = new CollisionBox(go);
+                        this.mCollisionBoxList.add(box);
+                    }
+                }
+
+            }
+
+
         }
     }
 
 
-    private void updateWorldVertices(){
-        for (CollisionBox box : this.mCollisionBoxList){
+    private void updateWorldVertices() {
+        for (CollisionBox box : this.mCollisionBoxList) {
             box.updateWorldVertices();
         }
     }
@@ -81,7 +106,7 @@ public class ColliderManager {
 
     }
 
-    public boolean isCollide(GameObject gameObjectA, GameObject gameObjectB){
+    public boolean isCollide(GameObject gameObjectA, GameObject gameObjectB) {
         return this.mCollisionList.get(gameObjectA) == gameObjectB;
 
     }

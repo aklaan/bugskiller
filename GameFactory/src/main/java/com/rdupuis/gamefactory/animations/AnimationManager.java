@@ -61,8 +61,6 @@ public class AnimationManager {
                 // traiter les actions suplémentaires a la fin de la lecture
                 //     onAnimationStop();
             }
-
-
         }
         updateEvent();
 

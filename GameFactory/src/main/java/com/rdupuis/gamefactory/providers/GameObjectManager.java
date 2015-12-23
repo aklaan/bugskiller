@@ -1,12 +1,12 @@
 package com.rdupuis.gamefactory.providers;
 
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
+import com.rdupuis.gamefactory.components.AbstractGameObject;
+import com.rdupuis.gamefactory.components.CopoundGameObject;
 import com.rdupuis.gamefactory.components.GameObject;
 import com.rdupuis.gamefactory.components.Scene;
 import com.rdupuis.gamefactory.components.Vertex;
-import com.rdupuis.gamefactory.shaders.ProgramShader;
 import com.rdupuis.gamefactory.utils.CONST;
 
 import java.nio.ByteBuffer;
@@ -20,9 +20,8 @@ import java.util.ArrayList;
  */
 public class GameObjectManager {
 
-    private int idSequenceNumber;
     private Scene mScene;
-    private ArrayList<GameObject> mGameObjectList;
+    private ArrayList<AbstractGameObject> mGameObjectList;
     public int[] vbo;
     public int[] vboi;
 
@@ -43,14 +42,14 @@ public class GameObjectManager {
         this.setScene(scene);
 
         //initialisation d'une liste d'objets vide
-        this.mGameObjectList = new ArrayList<GameObject>();
+        this.mGameObjectList = new ArrayList<AbstractGameObject>();
     }
 
-    public ArrayList<GameObject> GOList() {
+    public ArrayList<AbstractGameObject> GOList() {
         return mGameObjectList;
     }
 
-    public void add(GameObject gameObject) {
+    public void add(AbstractGameObject gameObject) {
         this.mGameObjectList.add(gameObject);
     }
 
@@ -140,9 +139,9 @@ public class GameObjectManager {
      * @param tagName
      * @return
      */
-    public GameObject getGameObjectByTag(String tagName) {
-        GameObject result = null;
-        for (GameObject gameObject : this.mGameObjectList) {
+    public AbstractGameObject getGameObjectByTag(String tagName) {
+        AbstractGameObject result = null;
+        for (AbstractGameObject gameObject : this.mGameObjectList) {
             // Log.i("info : ", gameObject.getTagName());
             if (gameObject.getTagName() == tagName) {
                 result = gameObject;
@@ -158,7 +157,7 @@ public class GameObjectManager {
     public void initializeGLContext() {
 
         //on récupère le nombre d'objets
-        int nbObjects = GOList().size();
+        int nbObjects = countObjects();
 
         //on crée un tableau qui va référencer les vertex buffer
         vbo = new int[nbObjects];
@@ -178,61 +177,74 @@ public class GameObjectManager {
         //pour chaque gameObject, on lui assigne un Glbuffer
         //pour la partie vertex et la partie index
         //ensuite on charge les buffers
-        for (GameObject gameObject : this.GOList()) {
-            gameObject.setGlVBoId(vbo[indx]);
-            this.loadVBO(gameObject);
+        for (AbstractGameObject gameObject : this.GOList()) {
 
-            gameObject.setGlVBiId(vboi[indx]);
-            this.loadVBOi(gameObject);
-            indx++;
+            //si on traite un GameObject classique
+            if (GameObject.class.isInstance(gameObject)) {
+                indx = loadVBs((GameObject) gameObject, indx);
+
+
+            }
+            //si on traite un objet composé
+            else if (CopoundGameObject.class.isInstance(gameObject)) {
+                CopoundGameObject co = (CopoundGameObject) gameObject;
+                for (GameObject GameObject : co.getGameObjectList()) {
+                    indx = this.loadVBs(GameObject, indx);
+                }
+
+            }
+
         }
 
 
     }
 
+
+
+    private int countObjects() {
+
+        int count = 0;
+        for (AbstractGameObject gameObject : this.GOList()) {
+
+            //si on traite un GameObject classique
+            if (GameObject.class.isInstance(gameObject)) {
+                count++;
+            }
+            //si on traite un objet composé
+            else if (CopoundGameObject.class.isInstance(gameObject)) {
+                CopoundGameObject co = (CopoundGameObject) gameObject;
+                for (GameObject GameObject : co.getGameObjectList()) {
+                    count++;
+
+
+                }
+            }
+        }
+    return count;
+    }
     /**
      *
      */
-public void update(){
-    for (GameObject gameObject:this.GOList()){
-        gameObject.update();
-        updateModelView(gameObject);
+    private int loadVBs(GameObject gameObject, int index) {
+        gameObject.setGlVBoId(vbo[index]);
+        this.loadVBO(gameObject);
+
+        gameObject.setGlVBiId(vboi[index]);
+        this.loadVBOi(gameObject);
+        index++;
+        return index;
     }
-}
 
 
     /**
-     * Mise à jour de la ModelView pour prendre en compte les
-     * modification apportées à l'ojet
-     * taille - position - rotation
-     * <p/>
-     * /!\ l'ordre où on applique les transformation et hyper important
-     * il faut toujours faire : translation*rotation*scale
+     *
      */
-
-    public void updateModelView(GameObject gameObject) {
-        float[] wrkRotationMatrix = new float[16];
-        float[] modelView = new float[16];
-
-        //on initialise une matrice identitaire
-        Matrix.setIdentityM(modelView, 0);
-
-        //on fabrique une matrice de déplacement vers les coordonnées x,y,z
-        Matrix.translateM(modelView, 0, gameObject.X, gameObject.Y, gameObject.Z);
-
-        //on fabrique une matrice de rotation
-        Matrix.setRotateEulerM(wrkRotationMatrix, 0, gameObject.angleRADX,
-                gameObject.angleRADY, gameObject.angleRADZ);
-
-        //Calcul de la matrice ModelView
-        Matrix.multiplyMM(gameObject.mModelView, 0, modelView, 0,
-                wrkRotationMatrix, 0);
-
-        //Scales matrix m in place by sx, sy, and sz.
-        Matrix.scaleM(gameObject.mModelView, 0, gameObject.getWidth(), gameObject.getHeight(), 0.f);
-
+    public void update() {
+        for (AbstractGameObject gameObject : this.GOList()) {
+            gameObject.update();
+            gameObject.updateModelView();
+        }
     }
-
 
 
 }
